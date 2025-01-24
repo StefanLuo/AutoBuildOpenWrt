@@ -79,20 +79,22 @@ jobs:
       
       - name: Copy pre-existing .config file
         run: |
+          cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config openwrt/.config
       
       - name: Set LAN IP and PPPoE credentials
         run: |
           # 修改 network 配置文件中的 LAN IP
-          sed -i "s/option ipaddr '192.168.1.1'/option ipaddr '${{ github.event.inputs.lan_ip }}'/g" files/etc/config/network
+          sed -i "s/option ipaddr '192.168.1.1'/option ipaddr '${{ github.event.inputs.lan_ip }}'/g" openwrt/files/etc/config/network
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
           sed -i '/config interface "wan"/a\ \ \ \ option proto "pppoe"' files/etc/config/network
-          sed -i "/config interface 'wan'/a\ \ \ \ option username '${{ github.event.inputs.pppoe_username }}'" files/etc/config/network
-          sed -i "/config interface 'wan'/a\ \ \ \ option password '${{ github.event.inputs.pppoe_password }}'" files/etc/config/network
+          sed -i "/config interface 'wan'/a\ \ \ \ option username '${{ github.event.inputs.pppoe_username }}'" openwrt/files/etc/config/network
+          sed -i "/config interface 'wan'/a\ \ \ \ option password '${{ github.event.inputs.pppoe_password }}'" openwrt/files/etc/config/network
       
       - name: Set root filesystem size
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
+          cd openwrt
           sed -i "s/^CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_size }}/" .config
       
       - name: Building Rockchip OpenWrt
