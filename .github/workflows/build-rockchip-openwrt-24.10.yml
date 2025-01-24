@@ -76,7 +76,12 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          ./scripts/feeds install -a
+
+      - name: Conform feeds 1
+        run: ./scripts/feeds install -a
+      
+      - name: Conform feeds 2
+        run: ./scripts/feeds install -a
       
       - name: Copy pre-existing .config file
         run: |
@@ -85,11 +90,16 @@ jobs:
       - name: Set LAN IP and PPPoE credentials
         run: |
           # 修改 network 配置文件中的 LAN IP
-          sed -i "s/option ipaddr '192.168.1.1'/option ipaddr '${{ github.event.inputs.lan_ip }}'/g" openwrt/files/etc/config/network
+          sed -i 's/192.168.1.1/${{ github.event.inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
+          echo "lan_ip: ${{ github.event.inputs.lan_ip }}"
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
-          sed -i '/config interface "wan"/a\ \ \ \ option proto "pppoe"' openwrt/files/etc/config/network
-          sed -i "/config interface 'wan'/a\ \ \ \ option username '${{ github.event.inputs.pppoe_username }}'" openwrt/files/etc/config/network
-          sed -i "/config interface 'wan'/a\ \ \ \ option password '${{ github.event.inputs.pppoe_password }}'" openwrt/files/etc/config/network
+          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
+            sed -i "s/username='username'/username='${{ github.event.inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
+            sed -i "s/username='password'/password='${{ github.event.inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+          fi
+          echo "pppoe_account: '${{ github.event.inputs.pppoe_account }}'"
+          echo "pppoe_password: '${{ github.event.inputs.pppoe_password }}'"
       
       - name: Set root filesystem size
         run: |
