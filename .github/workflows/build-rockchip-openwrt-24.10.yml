@@ -62,6 +62,20 @@ jobs:
         run: |
           git clone https://git.openwrt.org/openwrt/openwrt.git
           cd openwrt
+          git pull
+          git checkout v24.10.0-rc6
+
+      - name: Customize seeds
+        run: |
+          cat >> feeds.conf.default <<EOF
+          src-git passwall https://github.com/xiaorouji/openwrt-passwall.git
+          src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git
+          EOF
+      
+      - name: Update the feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
       
       - name: Copy pre-existing .config file
         run: |
