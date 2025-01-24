@@ -80,8 +80,8 @@ jobs:
         run: |
           cd openwrt
           cat >> feeds.conf.default <<EOF
-          src-git passwall https://github.com/xiaorouji/openwrt-passwall.git
-          src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git
+          src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main
+          src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           EOF
       
       - name: Update the feeds
