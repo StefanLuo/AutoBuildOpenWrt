@@ -66,6 +66,7 @@ jobs:
 
       - name: Customize seeds
         run: |
+          cd openwrt
           cat >> feeds.conf.default <<EOF
           src-git passwall https://github.com/xiaorouji/openwrt-passwall.git
           src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git
@@ -89,30 +90,35 @@ jobs:
       
       - name: Copy pre-existing .config file
         run: |
-          cp ${{ github.workspace }}/rockchip/imm.config openwrt/.config
+          cd openwrt
+          cp ${{ github.workspace }}/rockchip/imm.config .config
       
       - name: Set LAN IP and PPPoE credentials
         run: |
           # 修改 network 配置文件中的 LAN IP
-          sed -i 's/192.168.1.1/${{ github.event.inputs.lan_ip }}/g' openwrt/package/base-files/files/bin/config_generate
+          cd openwrt
+          sed -i 's/192.168.1.1/${{ github.event.inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
           echo "lan_ip: ${{ github.event.inputs.lan_ip }}"
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' openwrt/package/base-files/files/lib/functions/uci-defaults.sh
-            sed -i "s/username='username'/username='${{ github.event.inputs.pppoe_account }}'/g" openwrt/package/base-files/files/bin/config_generate
-            sed -i "s/username='password'/password='${{ github.event.inputs.pppoe_password }}'/g" openwrt/package/base-files/files/bin/config_generate
+            sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
+            sed -i "s/username='username'/username='${{ github.event.inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
+            sed -i "s/username='password'/password='${{ github.event.inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+            echo "pppoe_account: '${{ github.event.inputs.pppoe_account }}'"
+            echo "pppoe_password: '${{ github.event.inputs.pppoe_password }}'"
           fi
-          echo "pppoe_account: '${{ github.event.inputs.pppoe_account }}'"
-          echo "pppoe_password: '${{ github.event.inputs.pppoe_password }}'"
       
       - name: Set root filesystem size
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
           cd openwrt
-          sed -i "s/^CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_size }}/" .config
+          sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_size }}/g" .config
       
       - name: Building Rockchip OpenWrt
-        run: make
+        run: |
+          cd openwrt
+          make download -j2 V=s
+          make -j2 V=s
       
       - name: Generate Firmware SHA-256
         run: |
