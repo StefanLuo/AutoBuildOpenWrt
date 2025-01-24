@@ -114,7 +114,8 @@ jobs:
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
           cd openwrt
-          sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_size }}/g" .config
+          sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_partsize }}/g" .config
+          echo "rootfs_partsize: ${{ github.event.inputs.rootfs_partsize }}"
       
       - name: Building Rockchip OpenWrt
         run: |
