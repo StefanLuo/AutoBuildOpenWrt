@@ -1,0 +1,51 @@
+name: build-rockchip-openwrt-24.10
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        description: '输入软路由型号，可选值如下：'
+        options:
+          - friendlyarm_nanopi-r2s
+        required: true
+        default: 'friendlyarm_nanopi-r2s'
+      rootfs_partsize:
+        description: '设置软件包大小，单位(MB)'
+        required: true
+        default: '1024'
+      lan_ip:
+        description: '设置 LAN IP 地址'
+        required: true
+        default: '192.168.100.1'
+      enable_pppoe:
+        description: '是否配置 PPPoE 拨号信息？'
+        required: true
+        default: 'no'
+        type: choice
+        options:
+        - 'yes'
+        - 'no'
+      pppoe_account:
+        description: '宽带账号 (若启用PPPoE)'
+        required: false
+      pppoe_password:
+        description: '宽带密码 (若启用PPPoE)'
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/rockchip/build.sh
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
