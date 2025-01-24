@@ -40,7 +40,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+              
+      - name: 释放磁盘空间
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
       - name: Set up OpenWRT build environment
         run: |
           sudo apt-get update
