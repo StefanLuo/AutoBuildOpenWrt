@@ -76,10 +76,10 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          ./scripts/feeds install -a
       
       - name: Copy pre-existing .config file
         run: |
-          cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config openwrt/.config
       
       - name: Set LAN IP and PPPoE credentials
@@ -87,7 +87,7 @@ jobs:
           # 修改 network 配置文件中的 LAN IP
           sed -i "s/option ipaddr '192.168.1.1'/option ipaddr '${{ github.event.inputs.lan_ip }}'/g" openwrt/files/etc/config/network
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
-          sed -i '/config interface "wan"/a\ \ \ \ option proto "pppoe"' files/etc/config/network
+          sed -i '/config interface "wan"/a\ \ \ \ option proto "pppoe"' openwrt/files/etc/config/network
           sed -i "/config interface 'wan'/a\ \ \ \ option username '${{ github.event.inputs.pppoe_username }}'" openwrt/files/etc/config/network
           sed -i "/config interface 'wan'/a\ \ \ \ option password '${{ github.event.inputs.pppoe_password }}'" openwrt/files/etc/config/network
       
