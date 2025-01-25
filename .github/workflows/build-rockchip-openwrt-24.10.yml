@@ -118,7 +118,7 @@ jobs:
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
             sed -i "s/username='username'/username='${{ github.event.inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
-            sed -i "s/username='password'/password='${{ github.event.inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+            sed -i "s/password='password'/password='${{ github.event.inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
             echo "pppoe_account: '${{ github.event.inputs.pppoe_account }}'"
             echo "pppoe_password: '${{ github.event.inputs.pppoe_password }}'"
           fi
