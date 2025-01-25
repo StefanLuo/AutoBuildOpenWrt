@@ -135,8 +135,8 @@ jobs:
       
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz ${{ github.workspace }}
-          for file in *.img.gz; do
+          cp ${{ github.workspace }}/bin/targets/rockchip/armv8/*.tar.gz ${{ github.workspace }}
+          for file in *.tar.gz; do
             sha256sum "$file" > "$file.sha256"
             sha256sum -c "$file.sha256"
           done
@@ -148,7 +148,7 @@ jobs:
           name: OpenWrt-Rockchip
           body_path: ${{ github.workspace }}/info.md
           files: |
-            ${{ github.workspace }}/*.img.gz
+            ${{ github.workspace }}/*.tar.gz
             ${{ github.workspace }}/*.sha256
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
