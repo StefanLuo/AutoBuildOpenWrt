@@ -82,6 +82,8 @@ jobs:
           cat >> feeds.conf.default <<EOF
           src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main
           src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
+          src-git argon https://github.com/jerrykuku/luci-theme-argon.git
+          src-git argonconfig https://github.com/jerrykuku/luci-app-argon-config.git
           EOF
       
       - name: Update the feeds
