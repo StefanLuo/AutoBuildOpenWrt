@@ -58,7 +58,7 @@ jobs:
           gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
           python3-distutils python3-setuptools python3-pip rsync swig unzip \
           zlib1g-dev file wget
-          #pip3 install pyelftools
+          # pip3 install pyelftools
           sudo apt install python3-pyelftools
       
       - name: Validate PPPoE Inputs
