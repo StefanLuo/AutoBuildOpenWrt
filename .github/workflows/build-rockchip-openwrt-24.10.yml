@@ -75,7 +75,7 @@ jobs:
           git clone https://git.openwrt.org/openwrt/openwrt.git
           cd openwrt
           git pull
-          git checkout v24.10.0-rc6
+          git switch main
 
       - name: Customize seeds
         run: |
