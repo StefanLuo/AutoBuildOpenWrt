@@ -130,8 +130,8 @@ jobs:
       - name: Building Rockchip OpenWrt
         run: |
           cd openwrt
-          make download -j2 V=s
-          make -j2 V=s
+          make download -j$(nproc)
+          make -j$(nproc)
       
       - name: Generate Firmware SHA-256
         run: |
