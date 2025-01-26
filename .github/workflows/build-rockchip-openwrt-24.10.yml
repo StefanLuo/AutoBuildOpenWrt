@@ -72,10 +72,10 @@ jobs:
       
       - name: Clone OpenWRT source code
         run: |
-          git clone https://git.openwrt.org/openwrt/openwrt.git --depth=1 --branch=main
+          git clone https://git.openwrt.org/openwrt/openwrt.git
           cd openwrt
           git pull
-          # git checkout v24.10.0-rc6
+          git checkout v24.10.0-rc6
 
       - name: Customize seeds
         run: |
@@ -88,18 +88,15 @@ jobs:
           git clone https://github.com/jerrykuku/luci-theme-argon.git
           git clone https://github.com/jerrykuku/luci-app-argon-config.git
       
-      - name: Update the feeds
+      - name: Update and install the feeds 
         run: |
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
+          luci-lua-runtime luci-base csstidy luasrcdiet
 
-      - name: Conform feeds 1
-        run: |
-          cd openwrt
-          ./scripts/feeds install -a
-      
-      - name: Conform feeds 2
+      - name: Conform the feeds
         run: |
           cd openwrt
           ./scripts/feeds install -a
