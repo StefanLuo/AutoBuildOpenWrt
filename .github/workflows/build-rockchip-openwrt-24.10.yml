@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-22.04
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # - name: Checkout repository
+        # uses: actions/checkout@v3
               
       - name: 释放磁盘空间
         uses: jlumbroso/free-disk-space@main
@@ -80,15 +80,17 @@ jobs:
         run: |
           git clone https://git.openwrt.org/openwrt/openwrt.git
           cd openwrt
-          git pull
-          git checkout v24.10.0
+          git fetch --tags
+          LATEST_TAG=$(git tag | sort -V | tail -n1)
+          git checkout $LATEST_TAG
+          echo "Using latest stable version: $LATEST_TAG"
 
       - name: Customize seeds
         run: |
           cd openwrt
           cat >> feeds.conf.default <<EOF
-          src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;luci
-          src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;packages
+          src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main
+          src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           EOF
           cd package
           git clone https://github.com/jerrykuku/luci-theme-argon.git
