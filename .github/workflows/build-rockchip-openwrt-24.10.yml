@@ -66,6 +66,13 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           rustup update nightly
           rustup default nightly
+          echo "source $HOME/.cargo/env" >> $GITHUB_ENV
+          rustc --version
+          cargo --version
+
+      - name: Verify Rust Installation
+        run: |
+          source $HOME/.cargo/env
           rustc --version
           cargo --version
       
@@ -143,7 +150,7 @@ jobs:
       - name: Building Rockchip OpenWrt
         run: |
           cd openwrt
-          make download -j1
+          make download -j$(nproc)
           make -j1 V=s
       
       - name: Generate Firmware SHA-256
