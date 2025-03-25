@@ -62,6 +62,8 @@ jobs:
 
       - name: Install Rust Nightly
         run: |
+          rustup self uninstall -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           rustup update nightly
           rustup default nightly
           rustc --version
