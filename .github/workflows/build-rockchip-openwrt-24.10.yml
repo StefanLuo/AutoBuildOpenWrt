@@ -87,8 +87,8 @@ jobs:
         run: |
           cd openwrt
           cat >> feeds.conf.default <<EOF
-          src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main
-          src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
+          src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;packages
+          src-git passwallpackages https://github.com/xiaorouji/openwrt-passwall-packages.git;luci
           EOF
           cd package
           git clone https://github.com/jerrykuku/luci-theme-argon.git
@@ -97,6 +97,7 @@ jobs:
       - name: Update and install the feeds
         run: |
           cd openwrt
+          ./scripts/feeds clean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
