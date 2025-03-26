@@ -41,15 +41,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
               
-      #- name: Free disk spece
-        #uses: jlumbroso/free-disk-space@main
-        #with:
-          #tool-cache: true
-          #android: true
-          #dotnet: true
-          #haskell: true
-          #large-packages: true
-          #swap-storage: true
+      - name: Free disk spece
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
 
       - name: Set up OpenWRT build environment
         run: |
@@ -57,7 +57,8 @@ jobs:
           sudo apt-get install build-essential clang flex bison g++ gawk \
           gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
           python3-distutils python3-setuptools python3-pip python3-dev python3-pyelftools \
-          rsync swig unzip zlib1g-dev file wget libdeflate-dev
+          rsync swig unzip zlib1g-dev file wget
+          # libdeflate-dev
           # pip3 install pyelftools
 
       # - name: Install Rust Nightly
