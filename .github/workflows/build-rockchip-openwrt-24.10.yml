@@ -150,9 +150,9 @@ jobs:
           sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_partsize }}/g" .config
           echo "rootfs_partsize: ${{ github.event.inputs.rootfs_partsize }}"
 
-      - name: Force Cargo Nightly
-        run: |
-          cd openwrt
+      # - name: Force Cargo Nightly
+        # run: |
+          # cd openwrt
           # export PATH="$HOME/.cargo/bin:$PATH"
           # export RUSTUP_TOOLCHAIN=nightly
           # export CARGO="$HOME/.cargo/bin/cargo"
@@ -166,7 +166,7 @@ jobs:
           # 确保清理旧的缓存并强制编译
           # rm -rf openwrt/dl/rustc-*
           # rm -rf openwrt/build_dir/target-*/host/rustc-*
-          make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
+          # make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
       
       - name: Building Rockchip OpenWrt
         run: |
