@@ -113,17 +113,6 @@ jobs:
         run: |
           cd openwrt
           ./scripts/feeds install -a
-
-      - name: Patch OpenWrt Rust Version (Use rustup, Skip Source Download)
-        run: |
-          # 确保 OpenWrt 直接使用 rustup 版本，不下载 rustc 源码
-          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.87.0/g' openwrt/feeds/packages/lang/rust/Makefile
-          sed -i 's/PKG_SOURCE:=rustc-$(PKG_VERSION)-src.tar.gz/PKG_SOURCE:=/g' openwrt/feeds/packages/lang/rust/Makefile
-          sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
-          
-          # 删除 OpenWrt Rust 1.84.0 相关缓存，防止下载旧版本
-          rm -rf openwrt/dl/rustc-*
-          rm -rf openwrt/build_dir/target-*/host/rustc-*
       
       - name: Copy pre-existing .config file
         run: |
@@ -162,6 +151,9 @@ jobs:
           export RUSTC="$HOME/.cargo/bin/rustc"
           rustc --version
           cargo --version
+          # 确保清理旧的缓存并强制编译
+          rm -rf openwrt/dl/rustc-*
+          rm -rf openwrt/build_dir/target-*/host/rustc-*
           make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
       
       - name: Building Rockchip OpenWrt
