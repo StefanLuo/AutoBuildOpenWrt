@@ -41,15 +41,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
               
-      - name: 释放磁盘空间
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          swap-storage: true
+      #- name: 释放磁盘空间
+        #uses: jlumbroso/free-disk-space@main
+        #with:
+          #tool-cache: true
+          #android: true
+          #dotnet: true
+          #haskell: true
+          #large-packages: true
+          #swap-storage: true
 
       - name: Set up OpenWRT build environment
         run: |
@@ -68,12 +68,6 @@ jobs:
           export PATH="$HOME/.cargo/bin:$PATH"
           rustup update nightly
           rustup default nightly
-          rustc --version
-          cargo --version
-      
-      - name: Verify Rust Installation
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
           rustc --version
           cargo --version
       
@@ -147,6 +141,16 @@ jobs:
           cd openwrt
           sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_partsize }}/g" .config
           echo "rootfs_partsize: ${{ github.event.inputs.rootfs_partsize }}"
+
+      - name: Force Cargo Nightly
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          export RUSTUP_TOOLCHAIN=nightly
+          export CARGO="$HOME/.cargo/bin/cargo"
+          export RUSTC="$HOME/.cargo/bin/rustc"
+          rustc --version
+          cargo --version
+          make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
       
       - name: Building Rockchip OpenWrt
         run: |
