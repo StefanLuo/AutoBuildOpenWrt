@@ -57,19 +57,20 @@ jobs:
           sudo apt-get install build-essential clang flex bison g++ gawk \
           gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
           python3-distutils python3-setuptools python3-pip python3-dev python3-pyelftools \
-          rsync swig unzip zlib1g-dev file wget libdeflate-dev
+          rsync swig unzip zlib1g-dev file wget
+          # libdeflate-dev
           # pip3 install pyelftools
 
-      - name: Install Rust Nightly
-        run: |
-          if ! command -v rustup &> /dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          fi
-          #export PATH="$HOME/.cargo/bin:$PATH"
-          rustup update nightly
-          rustup default nightly
-          #rustc --version
-          #cargo --version
+      # - name: Install Rust Nightly
+        # run: |
+          # if ! command -v rustup &> /dev/null; then
+            # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          # fi
+          # export PATH="$HOME/.cargo/bin:$PATH"
+          # rustup update nightly
+          # rustup default nightly
+          # rustc --version
+          # cargo --version
       
       - name: Validate PPPoE Inputs
         run: |
@@ -113,7 +114,14 @@ jobs:
         run: |
           cd openwrt
           ./scripts/feeds install -a
-      
+
+      - name: Modify Makefile for Rust 1.85
+        run: |
+          # 修改 Makefile 中的 Rust 版本号
+          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' openwrt/feeds/packages/lang/rust/Makefile
+          # 替换对应的 Rust 1.85 的 SHA256 哈希值
+          sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' openwrt/feeds/packages/lang/rust/Makefile
+          
       - name: Copy pre-existing .config file
         run: |
           cd openwrt
@@ -145,19 +153,19 @@ jobs:
       - name: Force Cargo Nightly
         run: |
           cd openwrt
-          export PATH="$HOME/.cargo/bin:$PATH"
-          export RUSTUP_TOOLCHAIN=nightly
-          export CARGO="$HOME/.cargo/bin/cargo"
-          export RUSTC="$HOME/.cargo/bin/rustc"
-          rustc --version
-          cargo --version
+          # export PATH="$HOME/.cargo/bin:$PATH"
+          # export RUSTUP_TOOLCHAIN=nightly
+          # export CARGO="$HOME/.cargo/bin/cargo"
+          # export RUSTC="$HOME/.cargo/bin/rustc"
+          # rustc --version
+          # cargo --version
           # 修改 Makefile 使用 Rust nightly 工具链
-          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=nightly/g' openwrt/feeds/packages/lang/rust/Makefile
-          sed -i 's/PKG_SOURCE:=rustc-$(PKG_VERSION)-src.tar.gz/PKG_SOURCE:=/g' openwrt/feeds/packages/lang/rust/Makefile
-          sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
+          # sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=nightly/g' openwrt/feeds/packages/lang/rust/Makefile
+          # sed -i 's/PKG_SOURCE:=rustc-$(PKG_VERSION)-src.tar.gz/PKG_SOURCE:=/g' openwrt/feeds/packages/lang/rust/Makefile
+          # sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
           # 确保清理旧的缓存并强制编译
-          rm -rf openwrt/dl/rustc-*
-          rm -rf openwrt/build_dir/target-*/host/rustc-*
+          # rm -rf openwrt/dl/rustc-*
+          # rm -rf openwrt/build_dir/target-*/host/rustc-*
           make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
       
       - name: Building Rockchip OpenWrt
