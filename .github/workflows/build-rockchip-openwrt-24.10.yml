@@ -57,7 +57,7 @@ jobs:
           sudo apt-get install build-essential clang flex bison g++ gawk \
           gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
           python3-distutils python3-setuptools python3-pip python3-dev python3-pyelftools \
-          rsync swig unzip zlib1g-dev file wget
+          rsync swig unzip zlib1g-dev file wget libdeflate-dev
           # pip3 install pyelftools
 
       - name: Install Rust Nightly
@@ -151,6 +151,10 @@ jobs:
           export RUSTC="$HOME/.cargo/bin/rustc"
           rustc --version
           cargo --version
+          # 修改 Makefile 使用 Rust nightly 工具链
+          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=nightly/g' openwrt/feeds/packages/lang/rust/Makefile
+          sed -i 's/PKG_SOURCE:=rustc-$(PKG_VERSION)-src.tar.gz/PKG_SOURCE:=/g' openwrt/feeds/packages/lang/rust/Makefile
+          sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
           # 确保清理旧的缓存并强制编译
           rm -rf openwrt/dl/rustc-*
           rm -rf openwrt/build_dir/target-*/host/rustc-*
