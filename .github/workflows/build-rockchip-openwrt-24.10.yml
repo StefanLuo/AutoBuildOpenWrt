@@ -99,6 +99,16 @@ jobs:
           cd package
           git clone https://github.com/jerrykuku/luci-theme-argon.git
           git clone https://github.com/jerrykuku/luci-app-argon-config.git
+
+      - name: Patch OpenWrt Rust Version
+        run: |
+          # 确保 Rust 版本使用 1.87.0
+          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.87.0/g' openwrt/feeds/packages/lang/rust/Makefile
+          sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
+      
+          # 删除 OpenWrt 旧版 Rust 1.84.0 下载缓存，防止再次下载
+          rm -rf openwrt/dl/rustc-*
+          rm -rf openwrt/build_dir/target-*/host/rustc-*
       
       - name: Update and install the feeds
         run: |
