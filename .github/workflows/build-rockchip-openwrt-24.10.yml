@@ -150,7 +150,7 @@ jobs:
         run: |
           cd openwrt
           make download -j$(nproc)
-          make -j1 V=s
+          make -j(nproc) V=s
       
       - name: Generate Firmware SHA-256
         run: |
