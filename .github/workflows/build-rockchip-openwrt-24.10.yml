@@ -140,24 +140,6 @@ jobs:
           sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_partsize }}/g" .config
           echo "rootfs_partsize: ${{ github.event.inputs.rootfs_partsize }}"
 
-      # - name: Force Cargo Nightly
-        # run: |
-          # cd openwrt
-          # export PATH="$HOME/.cargo/bin:$PATH"
-          # export RUSTUP_TOOLCHAIN=nightly
-          # export CARGO="$HOME/.cargo/bin/cargo"
-          # export RUSTC="$HOME/.cargo/bin/rustc"
-          # rustc --version
-          # cargo --version
-          # 修改 Makefile 使用 Rust nightly 工具链
-          # sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=nightly/g' openwrt/feeds/packages/lang/rust/Makefile
-          # sed -i 's/PKG_SOURCE:=rustc-$(PKG_VERSION)-src.tar.gz/PKG_SOURCE:=/g' openwrt/feeds/packages/lang/rust/Makefile
-          # sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/g' openwrt/feeds/packages/lang/rust/Makefile
-          # 确保清理旧的缓存并强制编译
-          # rm -rf openwrt/dl/rustc-*
-          # rm -rf openwrt/build_dir/target-*/host/rustc-*
-          # make package/feeds/passwall_packages/shadowsocks-rust/compile V=s
-
       - name: Copy software config files
         run: |
           cd openwrt
