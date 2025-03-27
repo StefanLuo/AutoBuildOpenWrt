@@ -1,0 +1,91 @@
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option ula_prefix 'fd2c:f997:2f1a::/48'
+	option packet_steering '1'
+	option steering_flows '128'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth1'
+	option igmp_snooping '1'
+
+config device
+	option name 'eth1'
+	option macaddr '7e:39:8f:e1:47:e7'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '192.168.4.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+	list dns '223.5.5.5'
+	list dns '119.29.29.29'
+
+config device
+	option name 'eth0'
+	option macaddr '7e:39:8f:e1:47:e6'
+
+config interface 'wan'
+	option device 'eth0'
+	option proto 'pppoe'
+	option username '073195868521'
+	option password 'a123456@'
+	option ipv6 '1'
+
+config interface 'wan6'
+	option device '@wan'
+	option proto 'dhcpv6'
+
+config interface 'iptv'
+	option proto 'pppoe'
+	option device 'eth2'
+	option username 'XT004907746002@VOD'
+	option password '867492'
+	option ipv6 'auto'
+	option defaultroute '0'
+
+config interface 'wg'
+	option proto 'wireguard'
+	option private_key 'OEAqN5n5AZAad5sbICRCcfSLRHYy8LRL/6KnZukv4nQ='
+
+config wireguard_wg
+	option description 'OpenWrt_Hunan'
+	option public_key 'VhRA9iDdTTG2wpc04XuarZMfBcEsxrQWUqEiw6uuJzk='
+	option private_key '6LzpWtzgo/gj6876/6NOe45neUopR3Nrw51FB4dGanA='
+	option preshared_key '8PtZaEtqltVlt1SBYvEhYZK5LTBEGctKeJi8RfMrCRU='
+	list allowed_ips '192.168.2.0/24'
+	list allowed_ips '192.168.3.0/24'
+	list allowed_ips '192.168.5.0/24'
+	option route_allowed_ips '1'
+	option endpoint_host 'wgcu.stefanluo.xyz'
+	option endpoint_port '5045'
+	option persistent_keepalive '25'
+
+config route
+	option interface 'iptv'
+	option target '10.0.0.0/8'
+
+config route
+	option interface 'iptv'
+	option target '124.232.131.0/24'
+
+config route
+	option interface 'iptv'
+	option target '124.232.135.0/24'
+
+config route
+	option interface 'iptv'
+	option target '222.246.132.0/24'
+
+config route
+	option interface 'iptv'
+	option target '224.0.0.0/4'
+

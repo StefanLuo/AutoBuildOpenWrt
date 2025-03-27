@@ -1,0 +1,14 @@
+
+config instance
+	option enabled '1'
+	list address '0.0.0.0:7088'
+	list address '[::]:7088'
+	option loglevel '0'
+	option threads '0'
+	option precache_size '4096'
+	option ring_buffer_size '1024'
+	option multicast_recv_buffer_size '512'
+	option multicast_recv_timeout '2'
+	option rejoin_time '0'
+	option network 'iptv'
+
