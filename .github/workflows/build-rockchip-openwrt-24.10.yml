@@ -81,14 +81,14 @@ jobs:
         run: |
           # cd openwrt
           # cat >> feeds.conf.default <<EOF
-          # src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main
-          # src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
+          # src-git luci https://github.com/xiaorouji/openwrt-passwall.git;main
+          # src-git packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           # EOF
           cd openwrt
-          git clone https://github.com/xiaorouji/openwrt-passwall.git package/
-          git clone https://github.com/xiaorouji/openwrt-passwall-packages.git package/
-          git clone https://github.com/jerrykuku/luci-theme-argon.git package/
-          git clone https://github.com/jerrykuku/luci-app-argon-config.git package/
+          git clone https://github.com/xiaorouji/openwrt-passwall.git package/passwall
+          git clone https://github.com/xiaorouji/openwrt-passwall-packages.git package/passwall-packages
+          git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
+          git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
       
       - name: Update and install the feeds
@@ -96,14 +96,23 @@ jobs:
           cd openwrt
           ./scripts/feeds clean
           ./scripts/feeds update -a
-          ./scripts/feeds install -a -f
-          ./scripts/feeds install -f libev libpam liblzma libnetsnmp curl \
-          luci-lua-runtime luci-base csstidy luasrcdiet
+          cp -r package/passwall-packages/microsocks/* feeds/packages/net/microsocks
+          cp -r package/passwall-packages/sing-box/* feeds/packages/net/sing-box
+          cp -r package/passwall-packages/v2ray-geodata/* feeds/packages/net/v2ray-geodata
+          cp -r package/passwall-packages/xray-core/* feeds/packages/net/xray-core
+          rm -rf package/passwall-packages/microsocks \
+          package/passwall-packages/sing-box \
+          package/passwall-packages/v2ray-geodata \
+          package/passwall-packages/xray-core
+          ./scripts/feeds install -a
+          # ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
+          # luci-lua-runtime luci-base csstidy luasrcdiet golang luci-compat \
+          # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
 
       - name: Conform the feeds
         run: |
           cd openwrt
-          ./scripts/feeds install -a -f
+          ./scripts/feeds install -a
 
       - name: Modify Makefile for Rust 1.85
         run: |
@@ -116,7 +125,7 @@ jobs:
         run: |
           cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config .config
-          make oldconfig
+          yes | make oldconfig
       
       - name: Set LAN IP and PPPoE credentials
         run: |
