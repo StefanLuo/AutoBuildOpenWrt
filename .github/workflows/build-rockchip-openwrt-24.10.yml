@@ -116,7 +116,7 @@ jobs:
         run: |
           cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config .config
-          yes | make oldconfig
+          make deconfig
       
       - name: Set LAN IP and PPPoE credentials
         run: |
