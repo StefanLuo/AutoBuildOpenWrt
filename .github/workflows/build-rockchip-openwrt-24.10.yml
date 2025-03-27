@@ -40,6 +40,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
               
       - name: Free disk spece
         uses: jlumbroso/free-disk-space@main
@@ -116,29 +118,31 @@ jobs:
         run: |
           cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config .config
-          # yes | make oldconfig
+          yes | make oldconfig
       
       - name: Set LAN IP and PPPoE credentials
         run: |
           # 修改 network 配置文件中的 LAN IP
           cd openwrt
-          sed -i 's/192.168.1.1/${{ github.event.inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
-          echo "lan_ip: ${{ github.event.inputs.lan_ip }}"
+          sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
+          echo "lan_ip: ${{ inputs.lan_ip }}"
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
-            sed -i "s/username='username'/username='${{ github.event.inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
-            sed -i "s/password='password'/password='${{ github.event.inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
-            echo "pppoe_account: '${{ github.event.inputs.pppoe_account }}'"
-            echo "pppoe_password: '${{ github.event.inputs.pppoe_password }}'"
+            sed -i "s/username='username'/username='${{ inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
+            sed -i "s/password='password'/password='${{ inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+            echo "pppoe_account: '${{ inputs.pppoe_account }}'"
+            echo "pppoe_password: '${{ inputs.pppoe_password }}'"
           fi
       
       - name: Set root filesystem size
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
           cd openwrt
-          sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.rootfs_partsize }}/g" .config
-          echo "rootfs_partsize: ${{ github.event.inputs.rootfs_partsize }}"
+          # sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ inputs.rootfs_partsize }}/g" .config
+          sed -i "/CONFIG_TARGET_ROOTFS_PARTSIZE/d" .config
+          echo "CONFIG_TARGET_ROOTFS_PARTSIZE=${{ inputs.rootfs_partsize }}" >> .config
+          echo "rootfs_partsize: ${{ inputs.rootfs_partsize }}"
 
       - name: Copy software config files
         run: |
@@ -150,7 +154,7 @@ jobs:
         run: |
           cd openwrt
           make download -j$(nproc)
-          make -j(nproc) V=s
+          make -j$(nproc) V=s
       
       - name: Generate Firmware SHA-256
         run: |
