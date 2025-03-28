@@ -91,6 +91,8 @@ jobs:
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
+
+          ./scripts/feeds update -a
           curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
           mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package/cpufreq
