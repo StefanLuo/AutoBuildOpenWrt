@@ -94,24 +94,22 @@ jobs:
 
           mkdir -p feeds/luci/applications
           
-          #curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
-          #unzip tmp_packages.zip -d ./tmp_packages
-          #mv ./tmp_packages/immortalwrt-master/package/emortal/cpufreq ./package/cpufreq
-          #rm -rf tmp_packages.zip ./tmp_packages
-          #curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
-          #unzip tmp_packages.zip -d ./tmp_packages
-          #mv ./tmp_packages/packages-master/net/msd_lite ./package/msd_lite
-          #mv ./tmp_packages/packages-master/net/vlmcsd ./package/vlmcsd
-          #rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d /tmp_packages
+          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package/cpufreq
+          rm -rf tmp_packages.zip /tmp_packages
+          curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d /tmp_packages
+          mv tmp_packages/packages-master/net/msd_lite package/msd_lite
+          mv tmp_packages/packages-master/net/vlmcsd package/vlmcsd
+          rm -rf tmp_packages.zip /tmp_packages
           curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
-          unzip tmp_packages.zip -d ./tmp_packages
-          ls -l ./tmp_packages/luci-master/applications/
-          mv ./tmp_packages/luci-master/applications/luci-app-msd_lite ./feeds/luci/applications
-          ls -l ./feeds/luci/applications/
-          #mv ./tmp_packages/luci-master/applications/luci-app-vlmcsd ./feeds/luci/applications/luci-app-vlmcsd
-          #mv ./tmp_packages/luci-master/applications/luci-app-cpufreq ./feeds/luci/applications/luci-app-cpufreq
-          #mv ./tmp_packages/luci-master/applications/luci-app-autoreboot ./feeds/luci/applications/luci-app-autoreboot
-          #rm -rf tmp_packages.zip ./tmp_packages
+          unzip tmp_packages.zip -d /tmp_packages
+          mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications/luci-app-vlmcsd
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications/luci-app-cpufreq
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications/luci-app-autoreboot
+          rm -rf tmp_packages.zip /tmp_packages
       
       - name: Update and install the feeds
         run: |
