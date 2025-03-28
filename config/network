@@ -38,11 +38,7 @@ config interface 'wan'
 	option proto 'pppoe'
 	option username '073195868521'
 	option password 'a123456@'
-	option ipv6 '1'
-
-config interface 'wan6'
-	option device '@wan'
-	option proto 'dhcpv6'
+	option ipv6 'auto'
 
 config interface 'iptv'
 	option proto 'pppoe'
