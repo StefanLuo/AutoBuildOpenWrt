@@ -96,14 +96,15 @@ jobs:
           cd openwrt
           ./scripts/feeds clean
           ./scripts/feeds update -a
-          cp -r package/passwall-packages/microsocks/* feeds/packages/net/microsocks
-          cp -r package/passwall-packages/sing-box/* feeds/packages/net/sing-box
-          cp -r package/passwall-packages/v2ray-geodata/* feeds/packages/net/v2ray-geodata
-          cp -r package/passwall-packages/xray-core/* feeds/packages/net/xray-core
-          rm -rf package/passwall-packages/microsocks \
-          package/passwall-packages/sing-box \
-          package/passwall-packages/v2ray-geodata \
-          package/passwall-packages/xray-core
+          # cp -r package/passwall-packages/microsocks/* feeds/packages/net/microsocks
+          # cp -r package/passwall-packages/sing-box/* feeds/packages/net/sing-box
+          # cp -r package/passwall-packages/v2ray-geodata/* feeds/packages/net/v2ray-geodata
+          # cp -r package/passwall-packages/xray-core/* feeds/packages/net/xray-core
+          rm -rf feeds/packages/net/microsocks \
+          feeds/packages/net/sing-box \
+          feeds/packages/net/v2ray-geodata \
+          feeds/packages/net/xray-core
+          ./scripts/feeds update -a
           ./scripts/feeds install -a
           # ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
           # luci-lua-runtime luci-base csstidy luasrcdiet golang luci-compat \
