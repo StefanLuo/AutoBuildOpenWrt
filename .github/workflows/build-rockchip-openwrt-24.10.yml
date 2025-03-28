@@ -102,10 +102,10 @@ jobs:
           rm -rf tmp_packages.zip tmp_packages
           curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/luci-master/applications/luci-app-msd_lite package/luci-app-msd_lite
-          mv tmp_packages/luci-master/applications/luci-app-vlmcsd package/luci-app-vlmcsd
-          mv tmp_packages/luci-master/applications/luci-app-cpufreq package/luci-app-cpufreq
-          mv tmp_packages/luci-master/applications/luci-app-autoreboot package/luci-app-autoreboot
+          mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/application/luci-app-msd_lite
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/application/luci-app-vlmcsd
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/application/luci-app-cpufreq
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/application/luci-app-autoreboot
           rm -rf tmp_packages.zip tmp_packages
       
       - name: Update and install the feeds
@@ -113,13 +113,8 @@ jobs:
           cd openwrt
           ./scripts/feeds clean
           ./scripts/feeds update -a
-          # rm -rf feeds/luci/applications/luci-app-mosdns
-          # rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,v2ray*,sing*,smartdns}
-          # rm -rf feeds/packages/utils/v2dat
-          # rm -rf feeds/packages/lang/golang
-          # git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
           ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
-          luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang 
+          luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
 
@@ -133,7 +128,7 @@ jobs:
           cd openwrt
           curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh --no-sfe
 
-      - name: Setup Rust version is 1.85.0
+      - name: Setup Rust version to 1.85.0
         run: |
           cd openwrt
           # 修改 Makefile 中的 Rust 版本号
