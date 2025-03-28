@@ -90,7 +90,7 @@ jobs:
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
-          curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh
+          curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh --no-sfe
       
       - name: Update and install the feeds
         run: |
@@ -136,7 +136,6 @@ jobs:
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
           cd openwrt
-          # sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=${{ inputs.rootfs_partsize }}/g" .config
           sed -i "/CONFIG_TARGET_ROOTFS_PARTSIZE/d" .config
           echo "CONFIG_TARGET_ROOTFS_PARTSIZE=${{ inputs.rootfs_partsize }}" >> .config
           echo "rootfs_partsize: ${{ inputs.rootfs_partsize }}"
