@@ -87,29 +87,50 @@ jobs:
           src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall.git;main
           src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           EOF
+          
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
-          curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh --no-sfe
+          curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package/cpufreq
+          rm -rf tmp_packages.zip tmp_packages
+          curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/packages-master/net/msd_lite package/msd_lite
+          mv tmp_packages/packages-master/net/vlmcsd package/vlmcsd
+          rm -rf tmp_packages.zip tmp_packages
+          curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/luci-master/applications/luci-app-msd_lite package/luci-app-msd_lite
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd package/luci-app-vlmcsd
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq package/luci-app-cpufreq
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot package/luci-app-autoreboot
+          rm -rf tmp_packages.zip tmp_packages
       
       - name: Update and install the feeds
         run: |
           cd openwrt
           ./scripts/feeds clean
           ./scripts/feeds update -a
+          # rm -rf feeds/luci/applications/luci-app-mosdns
+          # rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,v2ray*,sing*,smartdns}
+          # rm -rf feeds/packages/utils/v2dat
+          # rm -rf feeds/packages/lang/golang
+          # git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
           # 修改 Makefile 中的 Rust 版本号
           sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' feeds/packages/lang/rust/Makefile
           # 替换对应的 Rust 1.85 的 SHA256 哈希值
           sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' feeds/packages/lang/rust/Makefile
           ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
-          luci-lua-runtime luci-base csstidy luasrcdiet golang luci-compat
+          luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang 
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
 
-      - name: Conform the feeds
-        run: |
-          cd openwrt
-          ./scripts/feeds install -a
+      # - name: Conform the feeds
+        # run: |
+          # cd openwrt
+          # ./scripts/feeds install -f -a
           
       - name: Copy pre-existing .config file
         run: |
@@ -143,7 +164,9 @@ jobs:
       - name: Copy software config files
         run: |
           cd openwrt
+          mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
+          cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
           cp -r ${{ github.workspace }}/config/* files/etc/config/
       
       - name: Building Rockchip OpenWrt
