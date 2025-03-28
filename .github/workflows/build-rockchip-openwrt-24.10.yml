@@ -90,6 +90,7 @@ jobs:
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
+          curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh
       
       - name: Update and install the feeds
         run: |
@@ -100,17 +101,15 @@ jobs:
           sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' feeds/packages/lang/rust/Makefile
           # 替换对应的 Rust 1.85 的 SHA256 哈希值
           sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' feeds/packages/lang/rust/Makefile
-          ./scripts/feeds install -a
           ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
           luci-lua-runtime luci-base csstidy luasrcdiet golang luci-compat
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
-          ./scripts/feeds install -a -f -p passwall_packages
+          ./scripts/feeds install -a
 
       - name: Conform the feeds
         run: |
           cd openwrt
           ./scripts/feeds install -a
-          ./scripts/feeds install -a -f -p passwall_packages
           
       - name: Copy pre-existing .config file
         run: |
