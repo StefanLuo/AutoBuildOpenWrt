@@ -94,9 +94,9 @@ jobs:
 
           curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package/cpufreq
-          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils/fullconenat
-          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils/fullconenat-nft
+          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
+          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils
+          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat-nft package/network/utils
           mv tmp_packages/immortalwrt-master/package/network/config/firewall/patches/fullconenat.patch package/network/config/firewall/patches/fullconenat.patch
           mv tmp_packages/immortalwrt-master/package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch
           mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch
@@ -104,8 +104,8 @@ jobs:
           rm -rf tmp_packages.zip ./tmp_packages
           curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/packages-master/net/msd_lite package/msd_lite
-          mv tmp_packages/packages-master/net/vlmcsd package/vlmcsd
+          mv tmp_packages/packages-master/net/msd_lite package
+          mv tmp_packages/packages-master/net/vlmcsd package
           rm -rf tmp_packages.zip ./tmp_packages
 
           ./scripts/feeds clean
@@ -117,6 +117,7 @@ jobs:
           mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
           rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
