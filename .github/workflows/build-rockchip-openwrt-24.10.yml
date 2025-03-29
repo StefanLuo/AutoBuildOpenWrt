@@ -92,9 +92,6 @@ jobs:
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
 
-          ./scripts/feeds clean
-          ./scripts/feeds update -a
-          
           curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
           mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package/cpufreq
@@ -110,6 +107,10 @@ jobs:
           mv tmp_packages/packages-master/net/msd_lite package/msd_lite
           mv tmp_packages/packages-master/net/vlmcsd package/vlmcsd
           rm -rf tmp_packages.zip ./tmp_packages
+
+          ./scripts/feeds clean
+          ./scripts/feeds update -a
+          
           curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
           mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
