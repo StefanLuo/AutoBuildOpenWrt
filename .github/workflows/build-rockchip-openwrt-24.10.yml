@@ -92,7 +92,8 @@ jobs:
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
 
-          mkdir -p feeds/luci/applications
+          ./scripts/feeds clean
+          ./scripts/feeds update -a
           
           curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
@@ -106,20 +107,29 @@ jobs:
           curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
           mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
-          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications/luci-app-vlmcsd
-          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications/luci-app-cpufreq
-          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications/luci-app-autoreboot
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
           rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
         run: |
           cd openwrt
-          ./scripts/feeds clean
+          rm -rf ./tmp
           ./scripts/feeds update -a
           ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
           luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
+
+      - name: Check if custom software installed
+        run: |
+          ls -l package/feeds/luci
+          if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
+            echo "自定义软件包安装成功"
+          else
+            echo "没有安装自定义软件包"
+          fi
 
       - name: Conform the feeds
         run: |
