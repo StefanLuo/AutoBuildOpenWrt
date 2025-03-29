@@ -145,10 +145,10 @@ jobs:
           cd openwrt
           ./scripts/feeds install -a
 
-      - name: Add fullconenat
-        run: |
-          cd openwrt
-          curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh --no-sfe
+      # - name: Add fullconenat
+        # run: |
+          # cd openwrt
+          # curl -sSL https://raw.githubusercontent.com/chenmozhijin/turboacc/luci/add_turboacc.sh -o add_turboacc.sh && bash add_turboacc.sh --no-sfe
 
       - name: Setup Rust version to 1.85.0
         run: |
