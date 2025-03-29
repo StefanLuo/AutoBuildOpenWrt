@@ -124,6 +124,7 @@ jobs:
 
       - name: Check if custom software installed
         run: |
+          cd openwrt
           ls -l package/feeds/luci
           if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
             echo "自定义软件包安装成功"
