@@ -97,10 +97,14 @@ jobs:
           mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
           mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils
           mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat-nft package/network/utils
-          mv tmp_packages/immortalwrt-master/package/network/config/firewall/patches/fullconenat.patch package/network/config/firewall/patches/fullconenat.patch
-          mv tmp_packages/immortalwrt-master/package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch
-          mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch
-          mv tmp_packages/immortalwrt-master/package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch
+          mkdir -p package/network/config/firewall/patches/
+          mv tmp_packages/immortalwrt-master/package/network/config/firewall/patches/fullconenat.patch package/network/config/firewall/patches/
+          mkdir -p package/network/config/firewall4/patches/
+          mv tmp_packages/immortalwrt-master/package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch package/network/config/firewall4/patches/
+          mkdir -p package/network/utils/nftables/patches/
+          mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch package/network/utils/nftables/patches/
+          mkdir -p package/libs/libnftnl/patches/
+          mv tmp_packages/immortalwrt-master/package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch package/libs/libnftnl/patches/
           rm -rf tmp_packages.zip ./tmp_packages
           curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
