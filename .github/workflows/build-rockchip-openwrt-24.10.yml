@@ -199,19 +199,20 @@ jobs:
         run: |
           cd openwrt
           # 设置 LAN IP
-          cat << 'EOF' > package/base-files/files/etc/uci-defaults/99-set-lan-ip
+          cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-lan-ip
           uci set network.lan.ipaddr='${{ inputs.lan_ip }}'
           uci set network.lan.dns='223.5.5.5 119.29.29.29'
           uci commit network
           /etc/init.d/network restart
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-lan-ip
+          vi package/base-files/files/etc/uci-defaults/99-set-lan-ip
 
       - name: Set pppoe
         run: |
           # 设置 PPPoE 用户名、密码以及 IPv6 设置
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            cat << EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
+            cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
             uci set network.wan.proto='pppoe'
             uci set network.wan.username='${{ inputs.pppoe_account }}'
             uci set network.wan.password='${{ inputs.pppoe_password }}'
@@ -221,13 +222,14 @@ jobs:
             /etc/init.d/network restart
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
+            vi package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           fi
 
       - name: Set iptv
         run: |
           # 设置 IPTV 用户名、密码
           if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
-            cat << EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
+            cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
             uci add network.interface
             uci set network.@interface[-1].proto='pppoe'
             uci set network.@interface[-1].device='eth2'
@@ -270,13 +272,14 @@ jobs:
             /etc/init.d/firewall reload
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
+            vi package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
 
       - name: Set wireguard
         run: |
           # 添加 wireguard 接口
           if [[ "${{ inputs.enable_wireguard }}" == "yes" ]]; then
-            cat << EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
+            cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
             uci add network.interface
             uci set network.@interface[-1].proto='wireguard'
             uci set network.@interface[-1].private_key='{{ secrets.WG_HNCT_PRIVATE_KEY }}'
@@ -301,6 +304,7 @@ jobs:
             /etc/init.d/firewall reload
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
+            vi package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
 
       - name: Add firewall rules
@@ -323,6 +327,7 @@ jobs:
           /etc/init.d/firewall reload
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-firewall
+          vi package/base-files/files/etc/uci-defaults/99-set-firewall
           
       # - name: Set LAN IP and PPPoE credentials
         # run: |
