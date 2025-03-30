@@ -46,14 +46,6 @@ on:
       iptv_pppoe_password:
         description: 'IPTV密码 (若启用IPTV)'
         required: false
-      iptv_static_router:
-        description: '是否添加 IPTV 静态路由 (适用湖南电信)'
-        required: false
-        default: 'yes'
-        type: choice
-        options:
-        - 'yes'
-        - 'no'
       enable_wireguard:
         description: '是否添加 WireGuard 接口'
         required: false
@@ -239,28 +231,8 @@ jobs:
             uci set network.@interface[-1].password="{{ inputs.iptv_pppoe_password }}"
             uci set network.@interface[-1].ipv6='auto'
             uci set network.@interface[-1].defaultroute='0'
-            uci commit network
-            /etc/init.d/network restart
-            uci add firewall zone
-            uci set firewall.@zone[-1].name='iptv'
-            uci set firewall.@zone[-1].input='ACCEPT'
-            uci set firewall.@zone[-1].output='ACCEPT'
-            uci set firewall.@zone[-1].forward='ACCEPT'
-            uci add_list firewall.@zone[-1].network='iptv'
-            uci set firewall.@zone[-1].masq='1'
-            uci set firewall.@zone[-1].mtu_fix='1'
-            uci add firewall forwarding
-            uci set firewall.@forwarding[-1].src='lan'
-            uci set firewall.@forwarding[-1].dest='iptv'
-            uci commit firewall
-            /etc/init.d/firewall reload
-            EOF
-            chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
-          fi
 
-          # 添加 IPTV 静态路由
-          if [[ "${{ inputs.iptv_static_router }}" == "yes" ]]; then
-            cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-routes
+            # 添加 IPTV 静态路由
             uci add network.route
             uci set network.@route[-1].interface='iptv'
             uci set network.@route[-1].target='10.0.0.0/8'
@@ -278,8 +250,21 @@ jobs:
             uci set network.@route[-1].target='224.0.0.0/4'
             uci commit network
             /etc/init.d/network restart
+            uci add firewall zone
+            uci set firewall.@zone[-1].name='iptv'
+            uci set firewall.@zone[-1].input='ACCEPT'
+            uci set firewall.@zone[-1].output='ACCEPT'
+            uci set firewall.@zone[-1].forward='ACCEPT'
+            uci add_list firewall.@zone[-1].network='iptv'
+            uci set firewall.@zone[-1].masq='1'
+            uci set firewall.@zone[-1].mtu_fix='1'
+            uci add firewall forwarding
+            uci set firewall.@forwarding[-1].src='lan'
+            uci set firewall.@forwarding[-1].dest='iptv'
+            uci commit firewall
+            /etc/init.d/firewall reload
             EOF
-            chmod +x package/base-files/files/etc/uci-defaults/99-set-routes
+            chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
 
           # 添加 wireguard 接口
