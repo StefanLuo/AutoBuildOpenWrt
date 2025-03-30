@@ -212,14 +212,14 @@ jobs:
           # 设置 PPPoE 用户名、密码以及 IPv6 设置
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
-            uci set network.wan.proto='pppoe'
-            uci set network.wan.username='${{ inputs.pppoe_account }}'
-            uci set network.wan.password='${{ inputs.pppoe_password }}'
-            uci set network.wan.ipv6='auto'
-            uci delete network.wan6
-            uci commit network
-            /etc/init.d/network restart
-            EOF
+          uci set network.wan.proto='pppoe'
+          uci set network.wan.username='${{ inputs.pppoe_account }}'
+          uci set network.wan.password='${{ inputs.pppoe_password }}'
+          uci set network.wan.ipv6='auto'
+          uci delete network.wan6
+          uci commit network
+          /etc/init.d/network restart
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           fi
 
@@ -228,47 +228,47 @@ jobs:
           # 设置 IPTV 用户名、密码
           if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
-            uci add network.interface
-            uci set network.@interface[-1].proto='pppoe'
-            uci set network.@interface[-1].device='eth2'
-            uci set network.@interface[-1].username='{{ inputs.iptv_pppoe_account }}'
-            uci set network.@interface[-1].password='{{ inputs.iptv_pppoe_password }}'
-            uci set network.@interface[-1].ipv6='auto'
-            uci set network.@interface[-1].defaultroute='0'
-            
-            # 添加 IPTV 静态路由
-            uci add network.route
-            uci set network.@route[-1].interface='iptv'
-            uci set network.@route[-1].target='10.0.0.0/8'
-            uci add network.route
-            uci set network.@route[-1].interface='iptv'
-            uci set network.@route[-1].target='124.232.131.0/24'
-            uci add network.route
-            uci set network.@route[-1].interface='iptv'
-            uci set network.@route[-1].target='124.232.135.0/24'
-            uci add network.route
-            uci set network.@route[-1].interface='iptv'
-            uci set network.@route[-1].target='222.246.132.0/24'
-            uci add network.route
-            uci set network.@route[-1].interface='iptv'
-            uci set network.@route[-1].target='224.0.0.0/4'
-            uci commit network
-            /etc/init.d/network restart
-            
-            uci add firewall zone
-            uci set firewall.@zone[-1].name='iptv'
-            uci set firewall.@zone[-1].input='ACCEPT'
-            uci set firewall.@zone[-1].output='ACCEPT'
-            uci set firewall.@zone[-1].forward='ACCEPT'
-            uci add_list firewall.@zone[-1].network='iptv'
-            uci set firewall.@zone[-1].masq='1'
-            uci set firewall.@zone[-1].mtu_fix='1'
-            uci add firewall forwarding
-            uci set firewall.@forwarding[-1].src='lan'
-            uci set firewall.@forwarding[-1].dest='iptv'
-            uci commit firewall
-            /etc/init.d/firewall reload
-            EOF
+          uci add network.interface
+          uci set network.@interface[-1].proto='pppoe'
+          uci set network.@interface[-1].device='eth2'
+          uci set network.@interface[-1].username='{{ inputs.iptv_pppoe_account }}'
+          uci set network.@interface[-1].password='{{ inputs.iptv_pppoe_password }}'
+          uci set network.@interface[-1].ipv6='auto'
+          uci set network.@interface[-1].defaultroute='0'
+          
+          # 添加 IPTV 静态路由
+          uci add network.route
+          uci set network.@route[-1].interface='iptv'
+          uci set network.@route[-1].target='10.0.0.0/8'
+          uci add network.route
+          uci set network.@route[-1].interface='iptv'
+          uci set network.@route[-1].target='124.232.131.0/24'
+          uci add network.route
+          uci set network.@route[-1].interface='iptv'
+          uci set network.@route[-1].target='124.232.135.0/24'
+          uci add network.route
+          uci set network.@route[-1].interface='iptv'
+          uci set network.@route[-1].target='222.246.132.0/24'
+          uci add network.route
+          uci set network.@route[-1].interface='iptv'
+          uci set network.@route[-1].target='224.0.0.0/4'
+          uci commit network
+          /etc/init.d/network restart
+          
+          uci add firewall zone
+          uci set firewall.@zone[-1].name='iptv'
+          uci set firewall.@zone[-1].input='ACCEPT'
+          uci set firewall.@zone[-1].output='ACCEPT'
+          uci set firewall.@zone[-1].forward='ACCEPT'
+          uci add_list firewall.@zone[-1].network='iptv'
+          uci set firewall.@zone[-1].masq='1'
+          uci set firewall.@zone[-1].mtu_fix='1'
+          uci add firewall forwarding
+          uci set firewall.@forwarding[-1].src='lan'
+          uci set firewall.@forwarding[-1].dest='iptv'
+          uci commit firewall
+          /etc/init.d/firewall reload
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
 
@@ -277,29 +277,29 @@ jobs:
           # 添加 wireguard 接口
           if [[ "${{ inputs.enable_wireguard }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
-            uci add network.interface
-            uci set network.@interface[-1].proto='wireguard'
-            uci set network.@interface[-1].private_key='{{ secrets.WG_HNCT_PRIVATE_KEY }}'
-            uci add_list network.@interface[-1].addresses='192.168.3.3'
-            
-            uci add network.wireguard_wg
-            uci set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
-            uci set network.@wireguard_wg[-1].public_key='{{ secrets.WG_SHCU_PUBLIC_KEY }}'
-            uci set network.@wireguard_wg[-1].private_key='{{ secrets.WG_SHCU_PRIVATE_KEY }}'
-            uci set network.@wireguard_wg[-1].preshared_key='{{ secrets.WG_HNCT_PRESHARED_KEY }}'
-            uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
-            uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
-            uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
-            uci set network.@wireguard_wg[-1].route_allowed_ips='1'
-            uci set network.@wireguard_wg[-1].endpoint_host='{{ secrets.WG_ENDPOINT_HOST }}'
-            uci set network.@wireguard_wg[-1].endpoint_port='{{ secrets.WG_ENDPOINT_PORT }}'
-            uci set network.@wireguard_wg[-1].persistent_keepalive='25'
-            uci commit network
-            /etc/init.d/network restart
-            uci add_list firewall.lan.network='wg'
-            uci commit firewall
-            /etc/init.d/firewall reload
-            EOF
+          uci add network.interface
+          uci set network.@interface[-1].proto='wireguard'
+          uci set network.@interface[-1].private_key='{{ secrets.WG_HNCT_PRIVATE_KEY }}'
+          uci add_list network.@interface[-1].addresses='192.168.3.3'
+          
+          uci add network.wireguard_wg
+          uci set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
+          uci set network.@wireguard_wg[-1].public_key='{{ secrets.WG_SHCU_PUBLIC_KEY }}'
+          uci set network.@wireguard_wg[-1].private_key='{{ secrets.WG_SHCU_PRIVATE_KEY }}'
+          uci set network.@wireguard_wg[-1].preshared_key='{{ secrets.WG_HNCT_PRESHARED_KEY }}'
+          uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
+          uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
+          uci add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
+          uci set network.@wireguard_wg[-1].route_allowed_ips='1'
+          uci set network.@wireguard_wg[-1].endpoint_host='{{ secrets.WG_ENDPOINT_HOST }}'
+          uci set network.@wireguard_wg[-1].endpoint_port='{{ secrets.WG_ENDPOINT_PORT }}'
+          uci set network.@wireguard_wg[-1].persistent_keepalive='25'
+          uci commit network
+          /etc/init.d/network restart
+          uci add_list firewall.lan.network='wg'
+          uci commit firewall
+          /etc/init.d/firewall reload
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
 
