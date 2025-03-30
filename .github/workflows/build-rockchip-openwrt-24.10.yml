@@ -63,26 +63,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
               
-      #- name: Free disk spece
-        #uses: jlumbroso/free-disk-space@main
-        #with:
-          #tool-cache: true
-          #android: true
-          #dotnet: true
-          #haskell: true
-          #large-packages: true
-          #swap-storage: true
+      - name: Free disk spece
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
 
-      #- name: Set up OpenWRT build environment
-        #run: |
-          #sudo apt-get update
-          #sudo apt-get upgrade
-          #sudo apt-get install build-essential clang flex bison g++ gawk \
-          #gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
-          #python3-distutils python3-setuptools python3-pip python3-dev python3-pyelftools \
-          #rsync swig unzip zlib1g-dev file wget
-          #sudo apt-get autoclean
-          #sudo apt-get autoremove
+      - name: Set up OpenWRT build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install build-essential clang flex bison g++ gawk \
+          gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
+          python3-distutils python3-setuptools python3-pip python3-dev python3-pyelftools \
+          rsync swig unzip zlib1g-dev file wget
+          sudo apt-get autoclean
+          sudo apt-get autoremove
       
       - name: Validate PPPoE、IPTV Inputs
         run: |
@@ -109,91 +109,91 @@ jobs:
           git checkout $LATEST_TAG
           echo "Using latest stable version: $LATEST_TAG"
 
-      #- name: Customize seeds
-        #run: |
-          #cd openwrt
-          #cat >> feeds.conf.default <<EOF
-          #src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall.git;main
-          #src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
-          #EOF
+      - name: Customize seeds
+        run: |
+          cd openwrt
+          cat >> feeds.conf.default <<EOF
+          src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall.git;main
+          src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
+          EOF
           
-          #git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
-          #git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
-          #git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
+          git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
+          git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
+          git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
 
-          #curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
-          #unzip tmp_packages.zip -d ./tmp_packages
-          #mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
-          #mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils
-          #mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat-nft package/network/utils
-          #mkdir -p package/network/config/firewall/patches/
-          #mv tmp_packages/immortalwrt-master/package/network/config/firewall/patches/fullconenat.patch package/network/config/firewall/patches/
-          #mkdir -p package/network/config/firewall4/patches/
-          #mv tmp_packages/immortalwrt-master/package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch package/network/config/firewall4/patches/
-          #mkdir -p package/network/utils/nftables/patches/
-          #mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/001-drop-useless-file.patch package/network/utils/nftables/patches/
-          #mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch package/network/utils/nftables/patches/
-          #mkdir -p package/libs/libnftnl/patches/
-          #mv tmp_packages/immortalwrt-master/package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch package/libs/libnftnl/patches/
-          #rm -rf tmp_packages.zip ./tmp_packages
-          #curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
-          #unzip tmp_packages.zip -d ./tmp_packages
-          #mv tmp_packages/packages-master/net/msd_lite package
-          #mv tmp_packages/packages-master/net/vlmcsd package
-          #rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
+          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat package/network/utils
+          mv tmp_packages/immortalwrt-master/package/network/utils/fullconenat-nft package/network/utils
+          mkdir -p package/network/config/firewall/patches/
+          mv tmp_packages/immortalwrt-master/package/network/config/firewall/patches/fullconenat.patch package/network/config/firewall/patches/
+          mkdir -p package/network/config/firewall4/patches/
+          mv tmp_packages/immortalwrt-master/package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch package/network/config/firewall4/patches/
+          mkdir -p package/network/utils/nftables/patches/
+          mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/001-drop-useless-file.patch package/network/utils/nftables/patches/
+          mv tmp_packages/immortalwrt-master/package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch package/network/utils/nftables/patches/
+          mkdir -p package/libs/libnftnl/patches/
+          mv tmp_packages/immortalwrt-master/package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch package/libs/libnftnl/patches/
+          rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/packages-master/net/msd_lite package
+          mv tmp_packages/packages-master/net/vlmcsd package
+          rm -rf tmp_packages.zip ./tmp_packages
 
-          #./scripts/feeds clean
-          #./scripts/feeds update -a
+          ./scripts/feeds clean
+          ./scripts/feeds update -a
           
-          #curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
-          #unzip tmp_packages.zip -d ./tmp_packages
-          #mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
-          #mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
-          #mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
-          #mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
-          #mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
-          #rm -rf feeds/luci/applications/luci-app-firewall
-          #mv tmp_packages/luci-master/applications/luci-app-firewall feeds/luci/applications
-          #rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
+          rm -rf feeds/luci/applications/luci-app-firewall
+          mv tmp_packages/luci-master/applications/luci-app-firewall feeds/luci/applications
+          rm -rf tmp_packages.zip ./tmp_packages
       
-      #- name: Update and install the feeds
-        #run: |
-          #cd openwrt
-          #rm -rf ./tmp
-          #./scripts/feeds update -a
-          #./scripts/feeds install libev libpam liblzma libnetsnmp curl \
-          #luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
+      - name: Update and install the feeds
+        run: |
+          cd openwrt
+          rm -rf ./tmp
+          ./scripts/feeds update -a
+          ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
+          luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
-          #./scripts/feeds install -a
+          ./scripts/feeds install -a
 
-      #- name: Check if custom software installed
-        #run: |
-          #cd openwrt
+      - name: Check if custom software installed
+        run: |
+          cd openwrt
           # ls -l package/feeds/luci
-          #if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
-            #echo "安装了自定义软件包"
-          #else
-            #echo "没有安装自定义软件包"
-          #fi
+          if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
+            echo "安装了自定义软件包"
+          else
+            echo "没有安装自定义软件包"
+          fi
 
-      #- name: Conform the feeds
-        #run: |
-          #cd openwrt
-          #./scripts/feeds install -a
+      - name: Conform the feeds
+        run: |
+          cd openwrt
+          ./scripts/feeds install -a
 
-      #- name: Setup Rust version to 1.85.0
-        #run: |
-          #cd openwrt
+      - name: Setup Rust version to 1.85.0
+        run: |
+          cd openwrt
           # 修改 Makefile 中的 Rust 版本号
-          #sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' feeds/packages/lang/rust/Makefile
+          sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' feeds/packages/lang/rust/Makefile
           # 替换对应的 Rust 1.85 的 SHA256 哈希值
-          #sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' feeds/packages/lang/rust/Makefile
+          sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' feeds/packages/lang/rust/Makefile
           
-      #- name: Copy pre-existing .config file
-        #run: |
-          #cd openwrt
-          #cp ${{ github.workspace }}/rockchip/imm.config .config
-          #yes | make oldconfig
+      - name: Copy pre-existing .config file
+        run: |
+          cd openwrt
+          cp ${{ github.workspace }}/rockchip/imm.config .config
+          yes | make oldconfig
 
       - name: Set lan ip
         run: |
