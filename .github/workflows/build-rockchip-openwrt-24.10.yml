@@ -32,6 +32,28 @@ on:
       pppoe_password:
         description: '宽带密码 (若启用PPPoE)'
         required: false
+      enable_iptv:
+        description: '是否添加 IPTV 接口 (适用湖南电信)'
+        required: false
+        default: 'yes'
+        type: choice
+        options:
+        - 'yes'
+        - 'no'
+      iptv_pppoe_account:
+        description: 'IPTV账号 (若启用IPTV)'
+        required: false
+      iptv_pppoe_password:
+        description: 'IPTV密码 (若启用IPTV)'
+        required: false
+      iptv_static_router:
+        description: '是否添加 IPTV 静态路由 (适用湖南电信)'
+        required: false
+        default: 'yes'
+        type: choice
+        options:
+        - 'yes'
+        - 'no'
 
 jobs:
   build:
@@ -62,11 +84,18 @@ jobs:
           sudo apt-get autoclean
           sudo apt-get autoremove
       
-      - name: Validate PPPoE Inputs
+      - name: Validate PPPoE、IPTV Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
               echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
+              exit 1
+            fi
+          fi
+
+          if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
+            if [[ -z "${{ inputs.iptv_pppoe_account }}" || -z "${{ inputs.iptv_pppoe_password }}" ]]; then
+              echo "Error: IPTV account and password must be provided when IPTV is enabled!"
               exit 1
             fi
           fi
@@ -123,8 +152,6 @@ jobs:
           mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
-          rm -rf feeds/luci/applications/luci-app-firewall
-          mv tmp_packages/luci-master/applications/luci-app-firewall feeds/luci/applications
           rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
@@ -170,22 +197,101 @@ jobs:
           cd openwrt
           cp ${{ github.workspace }}/rockchip/imm.config .config
           yes | make oldconfig
-      
-      - name: Set LAN IP and PPPoE credentials
+
+      - name: Add custom uci-defaults script
         run: |
-          # 修改 network 配置文件中的 LAN IP
           cd openwrt
-          sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
-          echo "lan_ip: ${{ inputs.lan_ip }}"
-          # 配置 WAN 接口为 PPPoE，并添加用户名和密码
+          # 设置 LAN IP
+          cat << EOF > package/base-files/files/etc/uci-defaults/99-set-lan-ip
+          uci set network.lan.ipaddr="${{ inputs.lan_ip }}"
+          uci set network.lan.dns='223.5.5.5 119.29.29.29'
+          uci commit network
+          /etc/init.d/network restart
+          EOF
+          chmod +x package/base-files/files/etc/uci-defaults/99-set-lan-ip
+
+          # 设置 PPPoE 用户名、密码以及 IPv6 设置
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
-            sed -i "s/username='username'/username='${{ inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
-            sed -i "s/password='password'/password='${{ inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
-            echo "pppoe_account: '${{ inputs.pppoe_account }}'"
-            echo "pppoe_password: '${{ inputs.pppoe_password }}'"
+            cat << EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
+            uci set network.wan.proto='pppoe'
+            uci set network.wan.username="${{ inputs.pppoe_account }}"
+            uci set network.wan.password="${{ inputs.pppoe_password }}"
+            uci set network.wan.ipv6='auto'
+            uci delete network.wan6
+            uci commit network
+            /etc/init.d/network restart
+            EOF
+            chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
+          fi
+
+          # 设置 IPTV 用户名、密码
+          if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
+            cat << EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
+            uci add network.interface
+            uci set network.@interface[-1].proto='pppoe'
+            uci set network.@interface[-1].device='eth2'
+            uci set network.@interface[-1].username="{{ inputs.iptv_pppoe_account }}"
+            uci set network.@interface[-1].password="{{ inputs.iptv_pppoe_password }}"
+            uci set network.@interface[-1].ipv6='auto'
+            uci set network.@interface[-1].defaultroute='0'
+            uci commit network
+            /etc/init.d/network restart
+            uci add firewall zone
+            uci set firewall.@zone[-1].name='iptv'
+            uci set firewall.@zone[-1].input='ACCEPT'
+            uci set firewall.@zone[-1].output='ACCEPT'
+            uci set firewall.@zone[-1].forward='ACCEPT'
+            uci add_list firewall.@zone[-1].network='iptv'
+            uci set firewall.@zone[-1].masq='1'
+            uci set firewall.@zone[-1].mtu_fix='1'
+            uci add firewall forwarding
+            uci set firewall.@forwarding[-1].src='lan'
+            uci set firewall.@forwarding[-1].dest='iptv'
+            uci commit firewall
+            /etc/init.d/firewall reload
+            EOF
+            chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
+          fi
+
+          # 添加 IPTV 静态路由
+          if [[ "${{ inputs.iptv_static_router }}" == "yes" ]]; then
+            cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-routes
+            uci add network.route
+            uci set network.@route[-1].interface='iptv'
+            uci set network.@route[-1].target='10.0.0.0/8'
+            uci add network.route
+            uci set network.@route[-1].interface='iptv'
+            uci set network.@route[-1].target='124.232.131.0/24'
+            uci add network.route
+            uci set network.@route[-1].interface='iptv'
+            uci set network.@route[-1].target='124.232.135.0/24'
+            uci add network.route
+            uci set network.@route[-1].interface='iptv'
+            uci set network.@route[-1].target='222.246.132.0/24'
+            uci add network.route
+            uci set network.@route[-1].interface='iptv'
+            uci set network.@route[-1].target='224.0.0.0/4'
+            uci commit network
+            /etc/init.d/network restart
+            EOF
+            chmod +x package/base-files/files/etc/uci-defaults/99-set-routes
           fi
       
+      # - name: Set LAN IP and PPPoE credentials
+        # run: |
+          # 修改 network 配置文件中的 LAN IP
+          # cd openwrt
+          # sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
+          # echo "lan_ip: ${{ inputs.lan_ip }}"
+          # 配置 WAN 接口为 PPPoE，并添加用户名和密码
+          # if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            # sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
+            # sed -i "s/username='username'/username='${{ inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
+            # sed -i "s/password='password'/password='${{ inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+            # echo "pppoe_account: '${{ inputs.pppoe_account }}'"
+            # echo "pppoe_password: '${{ inputs.pppoe_password }}'"
+          # fi
+          
       - name: Set root filesystem size
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
