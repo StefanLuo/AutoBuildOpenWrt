@@ -192,7 +192,7 @@ jobs:
       - name: Copy pre-existing .config file
         run: |
           cd openwrt
-          cp ${{ github.workspace }}/rockchip/imm.config .config
+          cp ${{ github.workspace }}/imm/rockchip/imm.config .config
           yes | make oldconfig
 
       - name: Set lan ip
