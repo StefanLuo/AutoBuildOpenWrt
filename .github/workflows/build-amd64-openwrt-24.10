@@ -1,4 +1,4 @@
-name: build-rockchip-openwrt-24.10
+name: build-amd64-openwrt-24.10
 
 on:
   workflow_dispatch:
@@ -7,9 +7,9 @@ on:
         type: choice
         description: '输入软路由型号，可选值如下：'
         options:
-          - friendlyarm_nanopi-r2s
+          - x86-64
         required: true
-        default: 'friendlyarm_nanopi-r2s'
+        default: 'x86-64'
       rootfs_partsize:
         description: '设置软件包大小，单位(MB)'
         required: true
@@ -17,7 +17,7 @@ on:
       lan_ip:
         description: '设置 LAN IP 地址'
         required: true
-        default: '192.168.4.1'
+        default: '192.168.100.1'
       enable_pppoe:
         description: '是否配置 PPPoE 拨号信息？'
         required: true
@@ -363,11 +363,11 @@ jobs:
         run: |
           cd openwrt
           make download -j$(nproc)
-          make -j1 V=s
+          make -j$(nproc) V=s
       
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/openwrt/bin/targets/rockchip/armv8/*.img.gz ${{ github.workspace }}
+          cp ${{ github.workspace }}/openwrt/bin/targets/x86/64/*.img.gz ${{ github.workspace }}
           for file in *.img.gz; do
             sha256sum "$file" > "$file.sha256"
             sha256sum -c "$file.sha256"
@@ -377,7 +377,7 @@ jobs:
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild
-          name: OpenWrt-Rockchip
+          name: OpenWrt-x86-64
           body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
