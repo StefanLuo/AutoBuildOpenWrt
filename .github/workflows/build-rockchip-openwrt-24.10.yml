@@ -123,6 +123,8 @@ jobs:
           mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
           mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
+          rm -rf feeds/luci/applications/luci-app-firewall
+          mv tmp_packages/luci-master/applications/luci-app-firewall feeds/luci/applications
           rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
