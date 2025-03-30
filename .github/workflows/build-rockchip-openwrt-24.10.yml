@@ -206,7 +206,6 @@ jobs:
           /etc/init.d/network restart
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-lan-ip
-          vi package/base-files/files/etc/uci-defaults/99-set-lan-ip
 
       - name: Set pppoe
         run: |
@@ -222,7 +221,6 @@ jobs:
             /etc/init.d/network restart
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
-            vi package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           fi
 
       - name: Set iptv
@@ -272,7 +270,6 @@ jobs:
             /etc/init.d/firewall reload
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
-            vi package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
 
       - name: Set wireguard
@@ -304,7 +301,6 @@ jobs:
             /etc/init.d/firewall reload
             EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
-            vi package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
 
       - name: Add firewall rules
@@ -327,7 +323,6 @@ jobs:
           /etc/init.d/firewall reload
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-firewall
-          vi package/base-files/files/etc/uci-defaults/99-set-firewall
           
       # - name: Set LAN IP and PPPoE credentials
         # run: |
