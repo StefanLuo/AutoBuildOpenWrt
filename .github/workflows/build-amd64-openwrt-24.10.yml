@@ -225,9 +225,13 @@ jobs:
             set network.wan.ipv6='auto'
             delete network.wan6
             commit network
+
+            del_list firewall.wan.network='wan6'
+            commit firewall
           EOT
 
           /etc/init.d/network restart >/dev/null 2>&1
+          /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
@@ -339,15 +343,16 @@ jobs:
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-firewall
           uci -q batch <<-EOT >/dev/null 2>&1
             # 添加 Web-Proxy-HTTPS 规则
-            add firewall.rule
+            add firewall rule
             set firewall.@rule[-1].name='Web-Proxy-HTTPS'
             add_list firewall.@rule[-1].proto='tcp'
             set firewall.@rule[-1].src='wan'
             set firewall.@rule[-1].dest_port='8443'
             set firewall.@rule[-1].target='ACCEPT'
+            commit firewall
 
             # 添加 Lucky 规则
-            add firewall.rule
+            add firewall rule
             set firewall.@rule[-1].name='Lucky'
             add_list firewall.@rule[-1].proto='tcp'
             set firewall.@rule[-1].src='wan'
