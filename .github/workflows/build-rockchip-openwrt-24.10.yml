@@ -210,11 +210,13 @@ jobs:
             set network.wan.username='${{ inputs.pppoe_account }}'
             set network.wan.password='${{ inputs.pppoe_password }}'
             set network.wan.ipv6='auto'
-            delete network.wan6
             commit network
 
-            set firewall.wan.network='wan'
+            delete firewall.@zone[1].network='wan6'
             commit firewall
+
+            delete network.wan6
+            commit network
           EOT
 
           /etc/init.d/network restart >/dev/null 2>&1
@@ -310,7 +312,7 @@ jobs:
             commit network
 
             # 配置防火墙
-            set firewall.@zone[0].network="lan wg"
+            add_list firewall.@zone[0].network='wg'
             commit firewall
           EOT
           
