@@ -202,7 +202,8 @@ jobs:
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-lan-ip
           uci -q batch <<-EOT >/dev/null 2>&1
           set network.lan.ipaddr='${{ inputs.lan_ip }}'
-          set network.lan.dns='223.5.5.5 119.29.29.29'
+          set network.lan.dns='223.5.5.5'
+          add_list network.lan.dns='119.29.29.29'
           commit network
           EOT
 
