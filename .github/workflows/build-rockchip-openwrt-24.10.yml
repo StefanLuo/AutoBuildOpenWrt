@@ -232,14 +232,27 @@ jobs:
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           uci -q batch <<-EOT >/dev/null 2>&1
             # 设置 IPTV 接口
-            add network interface iptv
-            set network.iptv.proto='pppoe'
-            set network.iptv.device='eth2'
-            set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
-            set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
-            set network.iptv.ipv6='auto'
+            set network.iptv='interface'
+          	set network.iptv.device='eth2'
+          	set network.iptv.proto='pppoe'
+          	set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
+          	set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
             set network.iptv.defaultroute='0'
             commit network
+
+            # 设置 IPTV 防火墙
+            set firewall.iptv='zone'
+          	set firewall.iptv.name='iptv'
+          	set firewall.iptv.network='iptv'
+          	set firewall.iptv.input='ACCEPT'
+          	set firewall.iptv.output='ACCEPT'
+          	set firewall.iptv.forward='ACCEPT'
+          	set firewall.iptv.masq='1'
+          	set firewall.iptv.mtu_fix='1'
+          	add firewall forwarding
+          	set firewall.@forwarding[-1].src='lan'
+          	set firewall.@forwarding[-1].dest='iptv'
+          	commit firewall
   
             # 添加 IPTV 静态路由
             add network route
@@ -258,22 +271,6 @@ jobs:
             set network.@route[-1].interface='iptv'
             set network.@route[-1].target='224.0.0.0/4'
             commit network
-  
-            # 设置 IPTV 防火墙
-            add firewall zone
-            set firewall.@zone[-1].name='iptv'
-            set firewall.@zone[-1].input='ACCEPT'
-            set firewall.@zone[-1].output='ACCEPT'
-            set firewall.@zone[-1].forward='ACCEPT'
-            add_list firewall.@zone[-1].network='iptv'
-            set firewall.@zone[-1].masq='1'
-            set firewall.@zone[-1].mtu_fix='1'
-            commit firewall
-           
-            add firewall forwarding
-            set firewall.@forwarding[-1].src='lan'
-            set firewall.@forwarding[-1].dest='iptv'
-            commit firewall
           EOT
 
           /etc/init.d/network restart >/dev/null 2>&1
@@ -290,15 +287,15 @@ jobs:
           if [[ "${{ inputs.enable_wireguard }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           uci -q batch <<-EOT >/dev/null 2>&1
-            add network interface wg
-            set network.wg.proto='wireguard'
-            set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
-            add_list network.wg.addresses='192.168.3.3'
-            commit network
+            # 创建 wireguard 接口
+          	set network.wg='interface'
+          	set network.wg.proto='wireguard'
+          	set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
+          	set network.wg.addresses='192.168.3.3'
+          	commit network
 
             # 配置 wireguard 设置
             add network wireguard_wg
-            set network.@wireguard_wg[-1].interface='wg'
             set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
             set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
             set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
@@ -313,7 +310,7 @@ jobs:
             commit network
 
             # 配置防火墙
-            add_list firewall.lan.network='wg'
+            set firewall.@zone[0].network="lan wg"
             commit firewall
           EOT
           
