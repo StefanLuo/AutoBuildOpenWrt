@@ -218,18 +218,18 @@ jobs:
           cd openwrt
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
-            uci -q batch <<-EOT >/dev/null 2>&1
-              set network.wan.proto='pppoe'
-              set network.wan.username='${{ inputs.pppoe_account }}'
-              set network.wan.password='${{ inputs.pppoe_password }}'
-              set network.wan.ipv6='auto'
-              delete network.wan6
-              commit network
-            EOT
+          uci -q batch <<-EOT >/dev/null 2>&1
+            set network.wan.proto='pppoe'
+            set network.wan.username='${{ inputs.pppoe_account }}'
+            set network.wan.password='${{ inputs.pppoe_password }}'
+            set network.wan.ipv6='auto'
+            delete network.wan6
+            commit network
+          EOT
 
-            /etc/init.d/network restart >/dev/null 2>&1
-            exit 0
-            EOF
+          /etc/init.d/network restart >/dev/null 2>&1
+          exit 0
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           fi
 
@@ -239,53 +239,56 @@ jobs:
           cd openwrt
           if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
-            uci -q batch <<-EOT >/dev/null 2>&1
-              # 设置 IPTV 接口
-              add network.interface
-              set network.@interface[-1].proto='pppoe'
-              set network.@interface[-1].device='eth2'
-              set network.@interface[-1].username='${{ inputs.iptv_pppoe_account }}'
-              set network.@interface[-1].password='${{ inputs.iptv_pppoe_password }}'
-              set network.@interface[-1].ipv6='auto'
-              set network.@interface[-1].defaultroute='0'
-    
-              # 添加 IPTV 静态路由
-              add network.route
-              set network.@route[-1].interface='iptv'
-              set network.@route[-1].target='10.0.0.0/8'
-              add network.route
-              set network.@route[-1].interface='iptv'
-              set network.@route[-1].target='124.232.131.0/24'
-              add network.route
-              set network.@route[-1].interface='iptv'
-              set network.@route[-1].target='124.232.135.0/24'
-              add network.route
-              set network.@route[-1].interface='iptv'
-              set network.@route[-1].target='222.246.132.0/24'
-              add network.route
-              set network.@route[-1].interface='iptv'
-              set network.@route[-1].target='224.0.0.0/4'
-              commit network
-    
-              # 设置 IPTV 防火墙
-              add firewall.zone
-              set firewall.@zone[-1].name='iptv'
-              set firewall.@zone[-1].input='ACCEPT'
-              set firewall.@zone[-1].output='ACCEPT'
-              set firewall.@zone[-1].forward='ACCEPT'
-              add_list firewall.@zone[-1].network='iptv'
-              set firewall.@zone[-1].masq='1'
-              set firewall.@zone[-1].mtu_fix='1'
-              add firewall.forwarding
-              set firewall.@forwarding[-1].src='lan'
-              set firewall.@forwarding[-1].dest='iptv'
-              commit firewall
-            EOT
+          uci -q batch <<-EOT >/dev/null 2>&1
+            # 设置 IPTV 接口
+            add network interface
+            set network.@interface[-1].name='iptv'
+            set network.@interface[-1].proto='pppoe'
+            set network.@interface[-1].device='eth2'
+            set network.@interface[-1].username='XT004907746002@VOD'
+            set network.@interface[-1].password='867492'
+            set network.@interface[-1].ipv6='auto'
+            set network.@interface[-1].defaultroute='0'
+            commit network
+  
+            # 添加 IPTV 静态路由
+            add network.route
+            set network.@route[-1].interface='iptv'
+            set network.@route[-1].target='10.0.0.0/8'
+            add network.route
+            set network.@route[-1].interface='iptv'
+            set network.@route[-1].target='124.232.131.0/24'
+            add network.route
+            set network.@route[-1].interface='iptv'
+            set network.@route[-1].target='124.232.135.0/24'
+            add network.route
+            set network.@route[-1].interface='iptv'
+            set network.@route[-1].target='222.246.132.0/24'
+            add network.route
+            set network.@route[-1].interface='iptv'
+            set network.@route[-1].target='224.0.0.0/4'
+            commit network
+  
+            # 设置 IPTV 防火墙
+            add firewall zone
+            set firewall.@zone[-1].name='iptv'
+            set firewall.@zone[-1].input='ACCEPT'
+            set firewall.@zone[-1].output='ACCEPT'
+            set firewall.@zone[-1].forward='ACCEPT'
+            add_list firewall.@zone[-1].network='iptv'
+            set firewall.@zone[-1].masq='1'
+            set firewall.@zone[-1].mtu_fix='1'
+           
+            add firewall forwarding
+            set firewall.@forwarding[-1].src='lan'
+            set firewall.@forwarding[-1].dest='iptv'
+            commit firewall
+          EOT
 
-            /etc/init.d/network restart >/dev/null 2>&1
-            /etc/init.d/firewall reload >/dev/null 2>&1
-            exit 0
-            EOF
+          /etc/init.d/network restart >/dev/null 2>&1
+          /etc/init.d/firewall reload >/dev/null 2>&1
+          exit 0
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
 
@@ -295,36 +298,37 @@ jobs:
           cd openwrt
           if [[ "${{ inputs.enable_wireguard }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
-            uci -q batch <<-EOT >/dev/null 2>&1
-              # 添加 wireguard 接口
-              add network.interface
-              set network.@interface[-1].proto='wireguard'
-              set network.@interface[-1].private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
-              add_list network.@interface[-1].addresses='192.168.3.3'
-    
-              add network.wireguard_wg
-              set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
-              set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
-              set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
-              set network.@wireguard_wg[-1].preshared_key='${{ secrets.WG_HNCT_PRESHARED_KEY }}'
-              add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
-              add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
-              add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
-              set network.@wireguard_wg[-1].route_allowed_ips='1'
-              set network.@wireguard_wg[-1].endpoint_host='${{ secrets.WG_ENDPOINT_HOST }}'
-              set network.@wireguard_wg[-1].endpoint_port='${{ secrets.WG_ENDPOINT_PORT }}'
-              set network.@wireguard_wg[-1].persistent_keepalive='25'
-              commit network
+          uci -q batch <<-EOT >/dev/null 2>&1
+            add network interface
+            set network.@interface[-1].name='wg'
+            set network.@interface[-1].proto='wireguard'
+            set network.@interface[-1].private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
+            add_list network.@interface[-1].addresses='192.168.3.3'
 
-              # 配置防火墙
-              add_list firewall.lan.network='wg'
-              commit firewall
-            EOT
-            
-            /etc/init.d/network restart >/dev/null 2>&1
-            /etc/init.d/firewall reload >/dev/null 2>&1
-            exit 0
-            EOF
+            # 配置 wireguard 设置
+            add network.wireguard_wg
+            set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
+            set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
+            set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
+            set network.@wireguard_wg[-1].preshared_key='${{ secrets.WG_HNCT_PRESHARED_KEY }}'
+            add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
+            add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
+            add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
+            set network.@wireguard_wg[-1].route_allowed_ips='1'
+            set network.@wireguard_wg[-1].endpoint_host='${{ secrets.WG_ENDPOINT_HOST }}'
+            set network.@wireguard_wg[-1].endpoint_port='${{ secrets.WG_ENDPOINT_PORT }}'
+            set network.@wireguard_wg[-1].persistent_keepalive='25'
+            commit network
+
+            # 配置防火墙
+            add_list firewall.lan.network='wg'
+            commit firewall
+          EOT
+          
+          /etc/init.d/network restart >/dev/null 2>&1
+          /etc/init.d/firewall reload >/dev/null 2>&1
+          exit 0
+          EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
 
