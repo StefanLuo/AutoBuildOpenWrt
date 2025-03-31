@@ -296,7 +296,7 @@ jobs:
 
             # 配置 wireguard 设置
             add network wireguard_wg
-            set network.@wireguard_wg[-1].description='OpenWrt_HuNan'
+            set network.@wireguard_wg[-1].description='OpenWrt_CU'
             set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
             set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
             set network.@wireguard_wg[-1].preshared_key='${{ secrets.WG_HNCT_PRESHARED_KEY }}'
