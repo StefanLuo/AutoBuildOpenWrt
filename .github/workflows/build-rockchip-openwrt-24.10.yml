@@ -235,25 +235,25 @@ jobs:
           uci -q batch <<-EOT >/dev/null 2>&1
             # 设置 IPTV 接口
             set network.iptv='interface'
-          	set network.iptv.device='eth2'
-          	set network.iptv.proto='pppoe'
-          	set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
-          	set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
+            set network.iptv.device='eth2'
+            set network.iptv.proto='pppoe'
+            set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
+            set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
             set network.iptv.defaultroute='0'
             commit network
 
             # 设置 IPTV 防火墙
             set firewall.iptv='zone'
-          	set firewall.iptv.name='iptv'
-          	set firewall.iptv.network='iptv'
-          	set firewall.iptv.input='ACCEPT'
-          	set firewall.iptv.output='ACCEPT'
-          	set firewall.iptv.forward='ACCEPT'
-          	set firewall.iptv.masq='1'
-          	set firewall.iptv.mtu_fix='1'
-          	add firewall forwarding
-          	set firewall.@forwarding[-1].src='lan'
-          	set firewall.@forwarding[-1].dest='iptv'
+            set firewall.iptv.name='iptv'
+            set firewall.iptv.network='iptv'
+            set firewall.iptv.input='ACCEPT'
+            set firewall.iptv.output='ACCEPT'
+            set firewall.iptv.forward='ACCEPT'
+            set firewall.iptv.masq='1'
+            set firewall.iptv.mtu_fix='1'
+            add firewall forwarding
+            set firewall.@forwarding[-1].src='lan'
+            set firewall.@forwarding[-1].dest='iptv'
           	commit firewall
   
             # 添加 IPTV 静态路由
@@ -290,11 +290,11 @@ jobs:
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           uci -q batch <<-EOT >/dev/null 2>&1
             # 创建 wireguard 接口
-          	set network.wg='interface'
-          	set network.wg.proto='wireguard'
-          	set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
-          	set network.wg.addresses='192.168.3.3'
-          	commit network
+            set network.wg='interface'
+            set network.wg.proto='wireguard'
+            set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
+            set network.wg.addresses='192.168.3.3'
+            commit network
 
             # 配置 wireguard 设置
             add network wireguard_wg
