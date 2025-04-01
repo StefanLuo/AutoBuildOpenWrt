@@ -212,11 +212,11 @@ jobs:
             set network.wan.ipv6='auto'
             commit network
 
-            delete firewall.@zone[1].network='wan6'
-            commit firewall
-
             delete network.wan6
             commit network
+            
+            set firewall.@zone[1].network='wan'
+            commit firewall
           EOT
 
           /etc/init.d/network restart >/dev/null 2>&1
@@ -381,8 +381,10 @@ jobs:
           cd openwrt
           mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
+          mkdir -p files/www
           cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
           cp -r ${{ github.workspace }}/config/* files/etc/config/
+          cp -r ${{ github.workspace }}/www/* files/www/
       
       - name: Building Rockchip OpenWrt
         run: |
