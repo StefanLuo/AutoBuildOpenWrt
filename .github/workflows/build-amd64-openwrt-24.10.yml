@@ -325,7 +325,6 @@ jobs:
 
       - name: Add firewall rules
         run: |
-          # 添加 Web-Proxy-HTTPS 规则
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-firewall
           uci -q batch <<-EOT >/dev/null 2>&1
@@ -347,6 +346,7 @@ jobs:
             set firewall.@rule[-1].target='ACCEPT'
             commit firewall
 
+            # 设置其他防火墙规则
             set firewall.@defaults[0].input='ACCEPT'
             set firewall.@defaults[0].flow_offloading='1'
             commit firewall
@@ -356,6 +356,20 @@ jobs:
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-firewall
+
+      - name: Set DHCP config
+        run: |
+          cd openwrt
+          cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-dhcp
+          uci -q batch <<-EOT >/dev/null 2>&1
+            set dhcp.lan.ra_flags='other-config'
+            commit dhcp
+          EOT
+
+          /etc/init.d/odhcpd restart >/dev/null 2>&1
+          exit 0
+          EOF
+          chmod +x package/base-files/files/etc/uci-defaults/99-set-dhcp
           
       # - name: Set LAN IP and PPPoE credentials
         # run: |
