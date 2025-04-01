@@ -399,9 +399,12 @@ jobs:
           mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
           mkdir -p files/www
-          cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
-          cp -r ${{ github.workspace }}/config/rockchip-r2s/* files/etc/config/
-          cp -r ${{ github.workspace }}/www/* files/www/
+
+          if [[ "${{ inputs.profile }}" == "friendlyarm_nanopi-r2s" ]]; then
+            cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
+            cp -r ${{ github.workspace }}/config/rockchip-r2s/* files/etc/config/
+            cp -r ${{ github.workspace }}/www/* files/www/
+          fi
       
       - name: Building Rockchip OpenWrt
         run: |
