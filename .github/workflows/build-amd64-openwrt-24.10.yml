@@ -212,11 +212,11 @@ jobs:
             set network.wan.ipv6='auto'
             commit network
 
-            delete firewall.@zone[1].network='wan6'
-            commit firewall
-
             delete network.wan6
             commit network
+
+            set firewall.@zone[1].network='wan'
+            commit firewall
           EOT
 
           /etc/init.d/network restart >/dev/null 2>&1
@@ -345,6 +345,10 @@ jobs:
             set firewall.@rule[-1].src='wan'
             set firewall.@rule[-1].dest_port='16601'
             set firewall.@rule[-1].target='ACCEPT'
+            commit firewall
+
+            set firewall.@defaults[0].input='ACCEPT'
+            set firewall.@defaults[0].flow_offloading='1'
             commit firewall
           EOT
 
