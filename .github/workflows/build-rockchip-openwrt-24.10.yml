@@ -400,7 +400,7 @@ jobs:
           mkdir -p files/etc/config
           mkdir -p files/www
           cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
-          cp -r ${{ github.workspace }}/config/rockchip-r2s/* files/etc/config/
+          cp -r ${{ github.workspace }}/config/* files/etc/config/
           cp -r ${{ github.workspace }}/www/* files/www/
       
       - name: Building Rockchip OpenWrt
