@@ -254,7 +254,7 @@ jobs:
             add firewall forwarding
             set firewall.@forwarding[-1].src='lan'
             set firewall.@forwarding[-1].dest='iptv'
-          	commit firewall
+            commit firewall
   
             # 添加 IPTV 静态路由
             add network route
