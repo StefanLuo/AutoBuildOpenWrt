@@ -346,6 +346,7 @@ jobs:
             set firewall.@rule[-1].target='ACCEPT'
             commit firewall
 
+            # 设置其他防火墙规则
             set firewall.@defaults[0].input='ACCEPT'
             set firewall.@defaults[0].flow_offloading='1'
             commit firewall
