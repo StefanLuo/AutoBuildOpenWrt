@@ -346,6 +346,10 @@ jobs:
             set firewall.@rule[-1].dest_port='16601'
             set firewall.@rule[-1].target='ACCEPT'
             commit firewall
+
+            set firewall.@defaults[0].input='ACCEPT'
+            set firewall.@defaults[0].flow_offloading='1'
+            commit firewall
           EOT
 
           /etc/init.d/firewall reload >/dev/null 2>&1
