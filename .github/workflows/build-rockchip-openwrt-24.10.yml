@@ -215,8 +215,8 @@ jobs:
                   add_list system.@timeserver[0].server='ntp2.aliyun.com'
                   add_list system.@timeserver[0].server='time1.cloud.tencent.com'
                   add_list system.@timeserver[0].server='time2.cloud.tencent.com'
-                  set system.@system[0].log_level='0'
-                  set system.@system[0].cronloglevel='0'
+                  set system.@system[0].conloglevel='1'
+                  set system.@system[0].cronloglevel='9'
                   commit system
           EOT
 
