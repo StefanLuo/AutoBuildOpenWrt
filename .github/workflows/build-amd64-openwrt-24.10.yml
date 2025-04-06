@@ -468,9 +468,9 @@ jobs:
       - name: Copy software config files
         run: |
           cd openwrt
-          mkdir -p files/etc/crontabs
+          # mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
-          cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
+          # cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
           cp -r ${{ github.workspace }}/config/* files/etc/config/
       
       - name: Building Rockchip OpenWrt
