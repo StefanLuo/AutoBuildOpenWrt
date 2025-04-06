@@ -56,7 +56,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-              
+      
       - name: Free disk spece
         uses: jlumbroso/free-disk-space@main
         with:
@@ -66,7 +66,7 @@ jobs:
           haskell: true
           large-packages: true
           swap-storage: true
-
+      
       - name: Set up OpenWRT build environment
         run: |
           sudo apt-get update
@@ -95,7 +95,7 @@ jobs:
           LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
           git checkout $LATEST_TAG
           echo "Using latest stable version: $LATEST_TAG"
-
+      
       - name: Customize seeds
         run: |
           cd openwrt
@@ -107,7 +107,7 @@ jobs:
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
-
+          
           curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           unzip tmp_packages.zip -d ./tmp_packages
           mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
@@ -117,7 +117,7 @@ jobs:
           mv tmp_packages/packages-master/net/msd_lite package
           mv tmp_packages/packages-master/net/vlmcsd package
           rm -rf tmp_packages.zip ./tmp_packages
-
+          
           ./scripts/feeds clean
           ./scripts/feeds update -a
           
@@ -139,7 +139,7 @@ jobs:
           luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
-
+      
       - name: Check if custom software installed
         run: |
           cd openwrt
@@ -149,12 +149,12 @@ jobs:
           else
             echo "没有安装自定义软件包"
           fi
-
+      
       - name: Conform the feeds
         run: |
           cd openwrt
           ./scripts/feeds install -a
-
+      
       - name: Setup Rust version to 1.85.0
         run: |
           cd openwrt
@@ -162,13 +162,13 @@ jobs:
           sed -i 's/PKG_VERSION:=1.84.0/PKG_VERSION:=1.85.0/' feeds/packages/lang/rust/Makefile
           # 替换对应的 Rust 1.85 的 SHA256 哈希值
           sed -i 's/PKG_HASH:=15cee7395b07ffde022060455b3140366ec3a12cbbea8f1ef2ff371a9cca51bf/PKG_HASH:=2f4f3142ffb7c8402139cfa0796e24baaac8b9fd3f96b2deec3b94b4045c6a8a/' feeds/packages/lang/rust/Makefile
-          
+      
       - name: Copy pre-existing .config file
         run: |
           cd openwrt
           cp ${{ github.workspace }}/imm/x86-64/imm.config .config
           yes | make oldconfig
-
+      
       - name: Set lan ip
         run: |
           # 设置 LAN IP
@@ -180,7 +180,7 @@ jobs:
                   add_list network.lan.dns='119.29.29.29'
                   commit network
           EOT
-
+          
           # 根据条件添加 IGMP Snooping 配置
           if [[ "${{ inputs.lan_ip }}" == "192.168.2.1" ]]; then
           uci -q batch <<-EOT >/dev/null 2>&1
@@ -189,12 +189,12 @@ jobs:
                   commit network
           EOT
           fi
-
+          
           /etc/init.d/network restart >/dev/null 2>&1
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-lan-ip
-
+      
       - name: Set system
         run: |
           # 设置系统默认配置
@@ -211,7 +211,7 @@ jobs:
                   set system.@system[0].cronloglevel='9'
                   commit system
           EOT
-
+          
           /etc/init.d/system restart >/dev/null 2>&1
           /etc/init.d/sysntpd restart >/dev/null 2>&1
           /etc/init.d/log restart >/dev/null 2>&1
@@ -219,7 +219,7 @@ jobs:
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-system
-
+      
       - name: Set pppoe
         run: |
           # 设置 PPPoE 用户名、密码以及 IPv6 设置
@@ -239,14 +239,14 @@ jobs:
                   set firewall.@zone[1].network='wan'
                   commit firewall
           EOT
-
+          
           /etc/init.d/network restart >/dev/null 2>&1
           /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           fi
-
+      
       - name: Set iptv
         run: |
           # 设置 IPTV 用户名、密码
@@ -275,14 +275,14 @@ jobs:
                   set firewall.@forwarding[-1].dest='iptv'
                   commit firewall
           EOT
-
+          
           /etc/init.d/network restart >/dev/null 2>&1
           /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           fi
-
+      
       - name: Set wireguard
         run: |
           # 添加 wireguard 接口
@@ -323,7 +323,7 @@ jobs:
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
-
+      
       - name: Add firewall rules
         run: |
           cd openwrt
@@ -337,7 +337,7 @@ jobs:
                   set firewall.@rule[-1].dest_port='8443'
                   set firewall.@rule[-1].target='ACCEPT'
                   commit firewall
-
+                  
                   # 添加 Web-Proxy-HTTP 规则
                   add firewall rule
                   set firewall.@rule[-1].name='Web-Proxy-HTTP'
@@ -361,26 +361,12 @@ jobs:
                   set firewall.@defaults[0].flow_offloading='1'
                   commit firewall
           EOT
-
-          # 添加 SHCT_Home 规则
-          if [[ "${{ inputs.lan_ip }}" == "192.168.2.1" ]]; then
-          uci -q batch <<-EOT >/dev/null 2>&1
-                  add firewall rule
-                  set firewall.@rule[-1].name='SHCT-Home'
-                  add_list firewall.@rule[-1].proto='tcp'
-                  add_list firewall.@rule[-1].proto='udp'
-                  set firewall.@rule[-1].src='wan'
-                  set firewall.@rule[-1].dest_port='5045'
-                  set firewall.@rule[-1].target='ACCEPT'
-                  commit firewall
-          EOT
-          fi
-
-          # 添加 SHCU_Home 规则
+          
+          # 添加 WireGuard 规则
           if [[ "${{ inputs.lan_ip }}" == "192.168.5.1" ]]; then
           uci -q batch <<-EOT >/dev/null 2>&1
                   add firewall rule
-                  set firewall.@rule[-1].name='SHCU-Home'
+                  set firewall.@rule[-1].name='WireGuard'
                   add_list firewall.@rule[-1].proto='tcp'
                   add_list firewall.@rule[-1].proto='udp'
                   set firewall.@rule[-1].src='wan'
@@ -389,12 +375,12 @@ jobs:
                   commit firewall
           EOT
           fi
-
+          
           /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-firewall
-
+      
       - name: Set DHCP config
         run: |
           cd openwrt
@@ -403,12 +389,12 @@ jobs:
                   set dhcp.lan.ra_flags='other-config'
                   commit dhcp
           EOT
-
+          
           /etc/init.d/odhcpd restart >/dev/null 2>&1
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-dhcp
-          
+      
       # - name: Set LAN IP and PPPoE credentials
         # run: |
           # 修改 network 配置文件中的 LAN IP
@@ -423,7 +409,7 @@ jobs:
             # echo "pppoe_account: '${{ inputs.pppoe_account }}'"
             # echo "pppoe_password: '${{ inputs.pppoe_password }}'"
           # fi
-          
+      
       - name: Set root filesystem size
         run: |
           # 更新 CONFIG_TARGET_ROOTFS_PARTSIZE 配置
@@ -431,13 +417,13 @@ jobs:
           sed -i "/CONFIG_TARGET_ROOTFS_PARTSIZE/d" .config
           echo "CONFIG_TARGET_ROOTFS_PARTSIZE=${{ inputs.rootfs_partsize }}" >> .config
           echo "rootfs_partsize: ${{ inputs.rootfs_partsize }}"
-
+      
       - name: Copy software config files
         run: |
           cd openwrt
-          # mkdir -p files/etc/crontabs
+          mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
-          # cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
+          cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
           cp -r ${{ github.workspace }}/config/* files/etc/config/
       
       - name: Building Rockchip OpenWrt
