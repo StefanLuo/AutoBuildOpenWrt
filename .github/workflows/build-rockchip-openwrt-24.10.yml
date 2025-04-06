@@ -436,12 +436,12 @@ jobs:
       - name: Copy software config files
         run: |
           cd openwrt
-          mkdir -p files/etc/crontabs
+          # mkdir -p files/etc/crontabs
           mkdir -p files/etc/config
           mkdir -p files/www
 
           if [[ "${{ inputs.profile }}" == "friendlyarm_nanopi-r2s" ]]; then
-            cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
+            # cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
             cp -r ${{ github.workspace }}/config/rockchip-r2s/* files/etc/config/
             cp -r ${{ github.workspace }}/www/* files/www/
           fi
