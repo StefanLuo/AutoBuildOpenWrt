@@ -377,7 +377,7 @@ jobs:
 
                   # 添加 HN_Home 规则
                   add firewall rule
-                  set firewall.@rule[-1].name='HN_Home'
+                  set firewall.@rule[-1].name='HNCT-Home'
                   add_list firewall.@rule[-1].proto='tcp'
                   add_list firewall.@rule[-1].proto='udp'
                   set firewall.@rule[-1].src='wan'
