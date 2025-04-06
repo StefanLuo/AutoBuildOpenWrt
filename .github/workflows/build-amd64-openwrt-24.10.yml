@@ -370,6 +370,15 @@ jobs:
                   set firewall.@rule[-1].dest_port='8443'
                   set firewall.@rule[-1].target='ACCEPT'
                   commit firewall
+
+                  # 添加 Web-Proxy-HTTP 规则
+                  add firewall rule
+                  set firewall.@rule[-1].name='Web-Proxy-HTTP'
+                  add_list firewall.@rule[-1].proto='tcp'
+                  set firewall.@rule[-1].src='wan'
+                  set firewall.@rule[-1].dest_port='8444'
+                  set firewall.@rule[-1].target='ACCEPT'
+                  commit firewall
                   
                   # 添加 Lucky 规则
                   add firewall rule
