@@ -374,6 +374,16 @@ jobs:
                   set firewall.@rule[-1].dest_port='16601'
                   set firewall.@rule[-1].target='ACCEPT'
                   commit firewall
+
+                  # 添加 HN_Home 规则
+                  add firewall rule
+                  set firewall.@rule[-1].name='HN_Home'
+                  add_list firewall.@rule[-1].proto='tcp'
+                  add_list firewall.@rule[-1].proto='udp'
+                  set firewall.@rule[-1].src='wan'
+                  set firewall.@rule[-1].dest_port='5045'
+                  set firewall.@rule[-1].target='ACCEPT'
+                  commit firewall
                   
                   # 设置其他防火墙规则
                   set firewall.@defaults[0].input='ACCEPT'
