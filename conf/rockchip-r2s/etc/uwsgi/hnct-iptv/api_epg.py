@@ -12,7 +12,7 @@ IPTV_URL = "http://10.255.0.110/mgtv_hndx/EPGV2/GetChannelList"
 IPTV_EPG_URL = "http://10.255.9.200/IPTV_EPG/Channel/GetChannelsList"
 
 # 你运行这个脚本的IP以及端口号
-IPTV_ZBPROXY = "https://iptvhn.stefanluo.xyz:8443/iptv"
+IPTV_ZBPROXY = "https://livehn.stefanluo.xyz:8443"
 
 # 文件名称
 M3U_OUTPUT_FILE = "hniptv.m3u"
@@ -59,9 +59,9 @@ def generate_m3u():
                         f'#EXTINF:-1 tvg-id="{channel["channelNumber"]}" '
                         f'tvg-logo="{channel.get("callsign", "")}",group-title="{category["categoryName"]}",'
                         f'{channel["channelName"]}\n'
-                        f'{IPTV_ZBPROXY}?url=http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
+                        # f'{IPTV_ZBPROXY}?url=http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
+			f'{IPTV_ZBPROXY}/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}&IASHttpSessionId=RR723020250408083536071187\n'
                         # f'http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
-
                     )
 
         with open(M3U_OUTPUT_FILE, "w", encoding="utf-8") as m3u_file:
