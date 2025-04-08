@@ -4,11 +4,9 @@ config igmpproxy
 
 config phyint
 	option network iptv
-	option zone iptv
 	option direction upstream
-	list altnet 0.0.0.0/0
+	list altnet 10.0.0.0/8
 
 config phyint
 	option network lan
-	option zone lan
 	option direction downstream
