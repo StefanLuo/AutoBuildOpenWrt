@@ -289,18 +289,31 @@ jobs:
                   add network route
                   set network.@route[-1].interface='iptv'
                   set network.@route[-1].target='10.0.0.0/8'
+                  
                   add network route
                   set network.@route[-1].interface='iptv'
                   set network.@route[-1].target='124.232.131.0/24'
+                  
                   add network route
                   set network.@route[-1].interface='iptv'
                   set network.@route[-1].target='124.232.135.0/24'
+                  
+                  add network route
+                  set network.@route[-1].interface='iptv'
+                  set network.@route[-1].target='124.232.231.0/24'
+                  
+                  add network route
+                  set network.@route[-1].interface='iptv'
+                  set network.@route[-1].target='220.170.28.0/24'
+                  
                   add network route
                   set network.@route[-1].interface='iptv'
                   set network.@route[-1].target='222.246.132.0/24'
+                  
                   add network route
                   set network.@route[-1].interface='iptv'
                   set network.@route[-1].target='224.0.0.0/4'
+                  
                   commit network
           EOT
           
