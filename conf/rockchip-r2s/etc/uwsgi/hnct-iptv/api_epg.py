@@ -217,7 +217,7 @@ def iptv_converter():
     if not playseek:
         # 直播逻辑
         url = source_url + f'&ispcode={ispcode}'
-        if not multicast:
+        if multicast:
             # abort(400, "Multicast 地址缺失")
             url = url + f'&Multicast={multicast}'
         url =  url + f'&{IASHttpSessionId}'
