@@ -12,7 +12,8 @@ IPTV_URL = "http://10.255.0.110/mgtv_hndx/EPGV2/GetChannelList"
 IPTV_EPG_URL = "http://10.255.9.200/IPTV_EPG/Channel/GetChannelsList"
 
 # 你运行这个脚本的IP以及端口号
-IPTV_ZBPROXY = "https://livehn.stefanluo.xyz:8443"
+IPTV_ZBPROXY = "https://iptvhn.stefanluo.xyz:8443/iptv"
+IPTV_ZCPROXY = "https://livehn.stefanluo.xyz:8443"
 
 # 文件名称
 M3U_OUTPUT_FILE = "hniptv.m3u"
@@ -56,11 +57,13 @@ def generate_m3u():
                 if category["categoryId"] in channel.get("categoryId", ""):
                     play_url = channel.get("playUrl", "")[6:]  # 去掉前缀
                     m3u_content += (
-                        f'#EXTINF:-1 tvg-id="{channel["channelNumber"]}" '
-                        f'tvg-logo="{channel.get("callsign", "")}",group-title="{category["categoryName"]}",'
+                        # f'#EXTINF:-1 tvg-id="{channel["channelNumber"]}" '
+			f'#EXTINF:-1 tvg-id="{channel["channelName"]}" '
+                        # f'tvg-logo="{channel.get("callsign", "")}",group-title="{category["categoryName"]}" '
+                        f'tvg-logo="https://iptvct.stefanluo.xyz:8443/Logo/{channel["channelName"]}.png" group-title="{category["categoryName"]}",'
                         f'{channel["channelName"]}\n'
                         # f'{IPTV_ZBPROXY}?url=http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
-			f'{IPTV_ZBPROXY}/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}&IASHttpSessionId=RR723020250408083536071187\n'
+                        f'{IPTV_ZBPROXY}?url={IPTV_ZCPROXY}/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
                         # f'http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
                     )
 
@@ -92,6 +95,43 @@ def fetch_epg(channel_id, after_day):
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
+
+# 处理节目表中特殊字符
+def convert_punctuation_to_fullwidth(input_str):
+    punctuation_map = {
+        '.': '。',
+        ',': '，',
+        '?': '？',
+        '!': '！',
+        ':': '：',
+        ';': '；',
+        '"': '“',
+        "'": '‘',
+        '(': '（',
+        ')': '）',
+        '[': '【',
+        ']': '】',
+        '{': '｛',
+        '}': '｝',
+        '<': '《',
+        '>': '》',
+        # '-': '－',
+        '_': '—',
+        '@': '＠',
+        '#': '＃',
+        '$': '＄',
+        '%': '％',
+        '&': '＆',
+        '*': '＊',
+        '+': '＋',
+        '=': '＝',
+        '/': '／',
+        '\\': '＼',
+        '^': '＾',
+        '`': '｀',
+        '~': '～'
+    }
+    return ''.join(punctuation_map.get(char, char) for char in input_str)
 
 # 生成 EPG XML
 def generate_epg_xml(after_day):
@@ -126,7 +166,7 @@ def generate_epg_xml(after_day):
                     "stop": f"{stop_str} +0800",
                     "channel": item["name"]
                 })
-                ET.SubElement(programme, "title").text = v["text"]
+                ET.SubElement(programme, "title").text = convert_punctuation_to_fullwidth(v["text"])
 
     with open(EPG_FILE, "wb") as f:
         f.write(ET.tostring(xml_root, encoding="utf-8", method="xml"))
@@ -142,6 +182,18 @@ def time_to_zone(m_time):
     except ValueError:
         return None
 
+def convert_to_utc(m_time):
+    try:
+        # 解析 EPG 时间字符串
+        epg_time = datetime.strptime(m_time, "%Y%m%d%H%M%S")
+        # 创建一个时区偏移量（UTC+8）
+        time_offset = timedelta(hours=8)
+        # 转换为 UTC 时间（减去 8 小时）
+        utc_time = epg_time - time_offset
+        return utc_time.strftime("%Y%m%d%H%M%S")
+    except ValueError:
+        return None
+
 @app.route("/iptv")
 def iptv_converter():
     source_url = request.args.get("url")
@@ -154,6 +206,7 @@ def iptv_converter():
 
     # 获取当前时间并转换为 UTC，生成 IASHttpSessionId
     current_time = time_to_zone(datetime.now().strftime("%Y%m%d%H%M%S"))
+
     if not current_time:
         abort(500, "时间转换失败")
 
@@ -163,16 +216,20 @@ def iptv_converter():
     url = source_url.split("?")[0]
     if not playseek:
         # 直播逻辑
+        url = source_url + f'&ispcode={ispcode}'
         if not multicast:
-            abort(400, "Multicast 地址缺失")
-        url = source_url + f'&Multicast={multicast}&ispcode={ispcode}'
+            # abort(400, "Multicast 地址缺失")
+            url = url + f'&Multicast={multicast}'
+        url =  url + f'&{IASHttpSessionId}'
     else:
         # 回看逻辑
         time_arr = playseek.split("-")
+
         if len(time_arr) != 2:
             abort(400, "playseek 参数错误")
-        starttime = time_to_zone(time_arr[0])
-        endtime = time_to_zone(time_arr[1])
+
+        starttime = convert_to_utc(time_arr[0])
+        endtime = convert_to_utc(time_arr[1])
 
         if not starttime or not endtime:
             abort(400, "时间格式错误")
@@ -199,5 +256,5 @@ def epg():
             return Response(f.read(), mimetype="application/xml")
 
 if __name__ == "__main__":
-    # app.run(host="0.0.0.0", port=1234, debug=False)
-    app.run()
+    app.run(host="0.0.0.0", port=1234, debug=True)
+    # app.run()
