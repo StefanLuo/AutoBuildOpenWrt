@@ -412,6 +412,15 @@ jobs:
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-dhcp
+
+      - name: Set install flask_cors
+        run: |
+          cd openwrt
+          cat <<EOF > package/base-files/files/etc/uci-defaults/99-install-flask-cors
+          pip install flask_cors
+          exit 0
+          EOF
+          chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
       
       # - name: Set LAN IP and PPPoE credentials
         # run: |
