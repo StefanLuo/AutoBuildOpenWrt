@@ -1,5 +1,6 @@
 import os
 import requests
+import re
 from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
 from flask import Flask, request, Response, abort, redirect
@@ -12,8 +13,9 @@ IPTV_URL = "http://10.255.0.110/mgtv_hndx/EPGV2/GetChannelList"
 IPTV_EPG_URL = "http://10.255.9.200/IPTV_EPG/Channel/GetChannelsList"
 
 # 你运行这个脚本的IP以及端口号
-IPTV_ZBPROXY = "https://iptvhn.stefanluo.xyz:8443/iptv"
-IPTV_ZCPROXY = "https://livehn.stefanluo.xyz:8443"
+IPTV_DLPROXY = "https://iptvhn.stefanluo.xyz:8443/iptv"
+IPTV_ZBPROXY = "https://livehn.stefanluo.xyz:8443"
+IPTV_ZBBJWS4KPROXY = "https://livebj4khn.stefanluo.xyz:8443"
 
 # 文件名称
 M3U_OUTPUT_FILE = "hniptv.m3u"
@@ -58,12 +60,12 @@ def generate_m3u():
                     play_url = channel.get("playUrl", "")[6:]  # 去掉前缀
                     m3u_content += (
                         # f'#EXTINF:-1 tvg-id="{channel["channelNumber"]}" '
-			f'#EXTINF:-1 tvg-id="{channel["channelName"]}" '
+                        f'#EXTINF:-1 tvg-id="{channel["channelName"]}" '
                         # f'tvg-logo="{channel.get("callsign", "")}",group-title="{category["categoryName"]}" '
                         f'tvg-logo="https://iptvct.stefanluo.xyz:8443/Logo/{channel["channelName"]}.png" group-title="{category["categoryName"]}",'
                         f'{channel["channelName"]}\n'
                         # f'{IPTV_ZBPROXY}?url=http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
-                        f'{IPTV_ZBPROXY}?url={IPTV_ZCPROXY}/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
+                        f'{IPTV_DLPROXY}?url=http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
                         # f'http://124.232.231.172:8089/000000002000/{channel["importId"]}/index.m3u8?zte_offset=0&ispcode=2&Multicast={play_url}\n'
                     )
 
@@ -193,6 +195,13 @@ def convert_to_utc(m_time):
         return utc_time.strftime("%Y%m%d%H%M%S")
     except ValueError:
         return None
+        
+def generate_random_number(digits):
+    if digits <= 0:
+        abort(400, "随机数位数错误")
+    min_value = 10**(digits - 1)
+    max_value = 10**digits - 1
+    return random.randint(min_value, max_value)
 
 @app.route("/iptv")
 def iptv_converter():
@@ -205,23 +214,33 @@ def iptv_converter():
         abort(404, "URL 参数缺失")
 
     # 获取当前时间并转换为 UTC，生成 IASHttpSessionId
-    current_time = time_to_zone(datetime.now().strftime("%Y%m%d%H%M%S"))
+    # current_time = time_to_zone(datetime.now().strftime("%Y%m%d%H%M%S"))
 
-    if not current_time:
-        abort(500, "时间转换失败")
+    # if not current_time:
+        # abort(500, "时间转换失败")
 
-    IASHttpSessionId = f"IASHttpSessionId=RR6450{current_time}897575"
+    #IASHttpSessionId = f"IASHttpSessionId=RR6450{current_time}897575"
 
     # 解析 URL 基础地址
     url = source_url.split("?")[0]
-    if not playseek:
-        # 直播逻辑
-        url = source_url + f'&ispcode={ispcode}'
-        if multicast:
-            # abort(400, "Multicast 地址缺失")
-            url = url + f'&Multicast={multicast}'
-        url =  url + f'&{IASHttpSessionId}'
-    else:
+    # 直播逻辑
+    url = source_url + f'&ispcode={ispcode}'
+    if multicast:
+        # abort(400, "Multicast 地址缺失")
+        url = url + f'&Multicast={multicast}'
+    headers = {
+        "User-Agent": "okhttp"
+    }
+    url = requests.get(url, headers=headers, allow_redirects=False).headers.get("Location")
+    print(url)
+    url = requests.get(url, headers=headers, allow_redirects=False).headers.get("Location")
+    print(url)
+    # http://220.170.28.10:6410/000000002000/201500000638/index.m3u8?zte_offset=0&ispcode=2&Multicast=239.76.253.246:9000&IASHttpSessionId=RR727420250410083425880469
+    # if "201500000638" in url:
+        # url = re.sub(r"^https?://[^/]+", IPTV_ZBBJWS4KPROXY, url)
+    #else:
+    url = re.sub(r"^https?://[^/]+", IPTV_ZBPROXY, url)
+    if playseek:
         # 回看逻辑
         time_arr = playseek.split("-")
 
@@ -233,8 +252,9 @@ def iptv_converter():
 
         if not starttime or not endtime:
             abort(400, "时间格式错误")
-
-        url = f"{url}?starttime={starttime}&endtime={endtime}&{IASHttpSessionId}"
+        
+        url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
+    print(url)
     return redirect(url)
 
 # 提供 M3U 文件的 HTTP 接口
