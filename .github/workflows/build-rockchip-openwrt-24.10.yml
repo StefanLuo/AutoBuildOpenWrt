@@ -106,7 +106,7 @@ jobs:
           cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
-          git checkout v24.10.0
+          git checkout v23.05.5
           # echo "Using latest stable version: $LATEST_TAG"
       
       - name: Customize seeds
