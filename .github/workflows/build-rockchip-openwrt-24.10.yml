@@ -104,10 +104,10 @@ jobs:
         run: |
           git clone https://git.openwrt.org/openwrt/openwrt.git
           cd openwrt
-          git fetch --tags
-          LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
-          git checkout $LATEST_TAG
-          echo "Using latest stable version: $LATEST_TAG"
+          # git fetch --tags
+          # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+          git checkout v24.10.0
+          # echo "Using latest stable version: $LATEST_TAG"
       
       - name: Customize seeds
         run: |
