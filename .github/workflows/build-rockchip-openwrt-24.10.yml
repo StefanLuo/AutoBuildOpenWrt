@@ -122,6 +122,31 @@ jobs:
           cd openwrt
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
           # yes | make oldconfig
+
+      - name: Set system
+        run: |
+          # 设置系统默认配置
+          cd openwrt
+          cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-system
+          uci -q batch <<-EOT >/dev/null 2>&1
+          set system.@system[0].timezone='CST-8'
+          set system.@system[0].zonename='Asia/Shanghai'
+          set system.@timeserver[0].server='ntp1.aliyun.com'
+          add_list system.@timeserver[0].server='ntp2.aliyun.com'
+          add_list system.@timeserver[0].server='time1.cloud.tencent.com'
+          add_list system.@timeserver[0].server='time2.cloud.tencent.com'
+          set system.@system[0].conloglevel='1'
+          set system.@system[0].cronloglevel='9'
+          commit system
+          EOT
+          
+          /etc/init.d/system restart >/dev/null 2>&1
+          /etc/init.d/sysntpd restart >/dev/null 2>&1
+          /etc/init.d/log restart >/dev/null 2>&1
+          /etc/init.d/cron restart >/dev/null 2>&1
+          exit 0
+          EOF
+          chmod +x package/base-files/files/etc/uci-defaults/99-set-system
           
       - name: Set wireguard
         run: |
