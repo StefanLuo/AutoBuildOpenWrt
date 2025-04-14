@@ -122,27 +122,27 @@ jobs:
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
           
-          # curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
-          # unzip tmp_packages.zip -d ./tmp_packages
-          # mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
-          # rm -rf tmp_packages.zip ./tmp_packages
-          # curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
-          # unzip tmp_packages.zip -d ./tmp_packages
-          # mv tmp_packages/packages-master/net/msd_lite package
-          # mv tmp_packages/packages-master/net/vlmcsd package
-          # rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
+          rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/packages-master/net/msd_lite package
+          mv tmp_packages/packages-master/net/vlmcsd package
+          rm -rf tmp_packages.zip ./tmp_packages
           
           # ./scripts/feeds clean
           # ./scripts/feeds update -a
           
-          # curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
-          # unzip tmp_packages.zip -d ./tmp_packages
-          # mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
-          # mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
-          # mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
-          # mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
-          # mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
-          # rm -rf tmp_packages.zip ./tmp_packages
+          curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
+          unzip tmp_packages.zip -d ./tmp_packages
+          mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
+          mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
+          rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
         run: |
@@ -157,12 +157,12 @@ jobs:
       - name: Check if custom software installed
         run: |
           cd openwrt
-          # ls -l package/feeds/luci
-          # if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
-            # echo "安装了自定义软件包"
-          # else
-            # echo "没有安装自定义软件包"
-          # fi
+          ls -l package/feeds/luci
+          if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
+            echo "安装了自定义软件包"
+          else
+            echo "没有安装自定义软件包"
+          fi
       
       - name: Conform the feeds
         run: |
@@ -189,14 +189,14 @@ jobs:
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-lan-ip
           uci -q batch <<-EOT >/dev/null 2>&1
-                  set network.lan.ipaddr='${{ inputs.lan_ip }}'
-                  set network.lan.dns='223.5.5.5'
-                  add_list network.lan.dns='119.29.29.29'
-                  commit network
-                  
-                  set network.@device[0].igmp_snooping='1'
-                  # set network.@device[0].query_interval='3000'
-                  commit network
+          set network.lan.ipaddr='${{ inputs.lan_ip }}'
+          set network.lan.dns='223.5.5.5'
+          add_list network.lan.dns='119.29.29.29'
+          commit network
+          
+          set network.@device[0].igmp_snooping='1'
+          # set network.@device[0].query_interval='3000'
+          commit network
           EOT
           
           /etc/init.d/network restart >/dev/null 2>&1
@@ -210,15 +210,15 @@ jobs:
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-system
           uci -q batch <<-EOT >/dev/null 2>&1
-                  set system.@system[0].timezone='CST-8'
-                  set system.@system[0].zonename='Asia/Shanghai'
-                  set system.@timeserver[0].server='ntp1.aliyun.com'
-                  add_list system.@timeserver[0].server='ntp2.aliyun.com'
-                  add_list system.@timeserver[0].server='time1.cloud.tencent.com'
-                  add_list system.@timeserver[0].server='time2.cloud.tencent.com'
-                  set system.@system[0].conloglevel='1'
-                  set system.@system[0].cronloglevel='9'
-                  commit system
+          set system.@system[0].timezone='CST-8'
+          set system.@system[0].zonename='Asia/Shanghai'
+          set system.@timeserver[0].server='ntp1.aliyun.com'
+          add_list system.@timeserver[0].server='ntp2.aliyun.com'
+          add_list system.@timeserver[0].server='time1.cloud.tencent.com'
+          add_list system.@timeserver[0].server='time2.cloud.tencent.com'
+          set system.@system[0].conloglevel='1'
+          set system.@system[0].cronloglevel='9'
+          commit system
           EOT
           
           /etc/init.d/system restart >/dev/null 2>&1
@@ -236,17 +236,17 @@ jobs:
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
           uci -q batch <<-EOT >/dev/null 2>&1
-                  set network.wan.proto='pppoe'
-                  set network.wan.username='${{ inputs.pppoe_account }}'
-                  set network.wan.password='${{ inputs.pppoe_password }}'
-                  set network.wan.ipv6='auto'
-                  commit network
-                  
-                  delete network.wan6
-                  commit network
-                  
-                  set firewall.@zone[1].network='wan'
-                  commit firewall
+          set network.wan.proto='pppoe'
+          set network.wan.username='${{ inputs.pppoe_account }}'
+          set network.wan.password='${{ inputs.pppoe_password }}'
+          set network.wan.ipv6='auto'
+          commit network
+          
+          delete network.wan6
+          commit network
+          
+          set firewall.@zone[1].network='wan'
+          commit firewall
           EOT
           
           /etc/init.d/network restart >/dev/null 2>&1
@@ -263,59 +263,59 @@ jobs:
           if [[ "${{ inputs.enable_iptv }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-iptv-interface
           uci -q batch <<-EOT >/dev/null 2>&1
-                  # 设置 IPTV 接口
-                  set network.iptv='interface'
-                  set network.iptv.device='eth2'
-                  set network.iptv.proto='pppoe'
-                  set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
-                  set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
-                  set network.iptv.defaultroute='0'
-                  commit network
+          # 设置 IPTV 接口
+          set network.iptv='interface'
+          set network.iptv.device='eth2'
+          set network.iptv.proto='pppoe'
+          set network.iptv.username='${{ inputs.iptv_pppoe_account }}'
+          set network.iptv.password='${{ inputs.iptv_pppoe_password }}'
+          set network.iptv.defaultroute='0'
+          commit network
+          
+          # 设置 IPTV 防火墙
+          set firewall.iptv='zone'
+          set firewall.iptv.name='iptv'
+          set firewall.iptv.network='iptv'
+          set firewall.iptv.input='ACCEPT'
+          set firewall.iptv.output='ACCEPT'
+          set firewall.iptv.forward='ACCEPT'
+          set firewall.iptv.masq='1'
+          set firewall.iptv.mtu_fix='1'
+          add firewall forwarding
+          set firewall.@forwarding[-1].src='lan'
+          set firewall.@forwarding[-1].dest='iptv'
+          commit firewall
+          
+          # 添加 IPTV 静态路由
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='10.0.0.0/8'
+          
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='124.232.131.0/24'
+          
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='124.232.135.0/24'
+          
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='124.232.231.0/24'
+          
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='220.170.28.0/24'
+          
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='222.246.132.0/24'
                   
-                  # 设置 IPTV 防火墙
-                  set firewall.iptv='zone'
-                  set firewall.iptv.name='iptv'
-                  set firewall.iptv.network='iptv'
-                  set firewall.iptv.input='ACCEPT'
-                  set firewall.iptv.output='ACCEPT'
-                  set firewall.iptv.forward='ACCEPT'
-                  set firewall.iptv.masq='1'
-                  set firewall.iptv.mtu_fix='1'
-                  add firewall forwarding
-                  set firewall.@forwarding[-1].src='lan'
-                  set firewall.@forwarding[-1].dest='iptv'
-                  commit firewall
-                  
-                  # 添加 IPTV 静态路由
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='10.0.0.0/8'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='124.232.131.0/24'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='124.232.135.0/24'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='124.232.231.0/24'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='220.170.28.0/24'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='222.246.132.0/24'
-                  
-                  add network route
-                  set network.@route[-1].interface='iptv'
-                  set network.@route[-1].target='224.0.0.0/4'
-                  
-                  commit network
+          add network route
+          set network.@route[-1].interface='iptv'
+          set network.@route[-1].target='224.0.0.0/4'
+          
+          commit network
           EOT
           
           /etc/init.d/network restart >/dev/null 2>&1
@@ -332,31 +332,31 @@ jobs:
           if [[ "${{ inputs.enable_wireguard }}" == "yes" ]]; then
             cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           uci -q batch <<-EOT >/dev/null 2>&1
-                  # 创建 wireguard 接口
-                  set network.wg='interface'
-                  set network.wg.proto='wireguard'
-                  set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
-                  set network.wg.addresses='192.168.3.3'
-                  commit network
-                  
-                  # 配置 wireguard 设置
-                  add network wireguard_wg
-                  set network.@wireguard_wg[-1].description='OpenWrt_CU'
-                  set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
-                  set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
-                  set network.@wireguard_wg[-1].preshared_key='${{ secrets.WG_HNCT_PRESHARED_KEY }}'
-                  add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
-                  add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
-                  add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
-                  set network.@wireguard_wg[-1].route_allowed_ips='1'
-                  set network.@wireguard_wg[-1].endpoint_host='${{ secrets.WG_ENDPOINT_HOST }}'
-                  set network.@wireguard_wg[-1].endpoint_port='${{ secrets.WG_ENDPOINT_PORT }}'
-                  set network.@wireguard_wg[-1].persistent_keepalive='25'
-                  commit network
-                  
-                  # 配置防火墙
-                  add_list firewall.@zone[0].network='wg'
-                  commit firewall
+          # 创建 wireguard 接口
+          set network.wg='interface'
+          set network.wg.proto='wireguard'
+          set network.wg.private_key='${{ secrets.WG_HNCT_PRIVATE_KEY }}'
+          set network.wg.addresses='192.168.3.3'
+          commit network
+          
+          # 配置 wireguard 设置
+          add network wireguard_wg
+          set network.@wireguard_wg[-1].description='OpenWrt_CU'
+          set network.@wireguard_wg[-1].public_key='${{ secrets.WG_SHCU_PUBLIC_KEY }}'
+          set network.@wireguard_wg[-1].private_key='${{ secrets.WG_SHCU_PRIVATE_KEY }}'
+          set network.@wireguard_wg[-1].preshared_key='${{ secrets.WG_HNCT_PRESHARED_KEY }}'
+          add_list network.@wireguard_wg[-1].allowed_ips='192.168.2.0/24'
+          add_list network.@wireguard_wg[-1].allowed_ips='192.168.3.0/24'
+          add_list network.@wireguard_wg[-1].allowed_ips='192.168.5.0/24'
+          set network.@wireguard_wg[-1].route_allowed_ips='1'
+          set network.@wireguard_wg[-1].endpoint_host='${{ secrets.WG_ENDPOINT_HOST }}'
+          set network.@wireguard_wg[-1].endpoint_port='${{ secrets.WG_ENDPOINT_PORT }}'
+          set network.@wireguard_wg[-1].persistent_keepalive='25'
+          commit network
+          
+          # 配置防火墙
+          add_list firewall.@zone[0].network='wg'
+          commit firewall
           EOT
           
           /etc/init.d/network restart >/dev/null 2>&1
@@ -371,28 +371,37 @@ jobs:
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-firewall
           uci -q batch <<-EOT >/dev/null 2>&1
-                  # 添加 Web-Proxy-HTTPS 规则
-                  add firewall rule
-                  set firewall.@rule[-1].name='Web-Proxy-HTTPS'
-                  add_list firewall.@rule[-1].proto='tcp'
-                  set firewall.@rule[-1].src='wan'
-                  set firewall.@rule[-1].dest_port='8443'
-                  set firewall.@rule[-1].target='ACCEPT'
-                  commit firewall
+          # 添加 Web-Proxy-HTTPS 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Web-Proxy-HTTPS'
+          add_list firewall.@rule[-1].proto='tcp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_port='8443'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
+
+          # 添加 Web-Proxy-HTTP 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Web-Proxy-HTTP'
+          add_list firewall.@rule[-1].proto='tcp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_port='8444'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
+          
+          # 添加 Lucky 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Lucky'
+          add_list firewall.@rule[-1].proto='tcp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_port='16601'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
                   
-                  # 添加 Lucky 规则
-                  add firewall rule
-                  set firewall.@rule[-1].name='Lucky'
-                  add_list firewall.@rule[-1].proto='tcp'
-                  set firewall.@rule[-1].src='wan'
-                  set firewall.@rule[-1].dest_port='16601'
-                  set firewall.@rule[-1].target='ACCEPT'
-                  commit firewall
-                  
-                  # 设置其他防火墙规则
-                  set firewall.@defaults[0].input='ACCEPT'
-                  set firewall.@defaults[0].flow_offloading='1'
-                  commit firewall
+          # 设置其他防火墙规则
+          # set firewall.@defaults[0].input='ACCEPT'
+          set firewall.@defaults[0].flow_offloading='1'
+          commit firewall
           EOT
           
           /etc/init.d/firewall reload >/dev/null 2>&1
@@ -405,8 +414,8 @@ jobs:
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-dhcp
           uci -q batch <<-EOT >/dev/null 2>&1
-                  set dhcp.lan.ra_flags='other-config'
-                  commit dhcp
+          set dhcp.lan.ra_flags='other-config'
+          commit dhcp
           EOT
           
           /etc/init.d/odhcpd restart >/dev/null 2>&1
@@ -414,14 +423,14 @@ jobs:
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-dhcp
 
-      - name: Set install flask_cors
-        run: |
-          cd openwrt
-          cat <<EOF > package/base-files/files/etc/uci-defaults/99-install-flask-cors
-          pip install flask_cors
-          exit 0
-          EOF
-          chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
+      # - name: Set install flask_cors
+        # run: |
+          # cd openwrt
+          # cat <<EOF > package/base-files/files/etc/uci-defaults/99-install-flask-cors
+          # pip install flask_cors
+          # exit 0
+          # EOF
+          # chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
       
       # - name: Set LAN IP and PPPoE credentials
         # run: |
