@@ -13,9 +13,8 @@ IPTV_URL = "http://10.255.0.110/mgtv_hndx/EPGV2/GetChannelList"
 IPTV_EPG_URL = "http://10.255.9.200/IPTV_EPG/Channel/GetChannelsList"
 
 # 你运行这个脚本的IP以及端口号
-IPTV_DLPROXY = "https://iptvhn.stefanluo.xyz:8443/iptv"
-IPTV_ZBPROXY = "https://livehn.stefanluo.xyz:8443"
-IPTV_ZBBJWS4KPROXY = "https://livebj4khn.stefanluo.xyz:8443"
+IPTV_DLPROXY = "http://iptvhn.stefanluo.xyz:8444/iptv"
+IPTV_ZBPROXY = "http://livehn.stefanluo.xyz:8444"
 
 # 文件名称
 M3U_OUTPUT_FILE = "hniptv.m3u"
@@ -232,9 +231,9 @@ def iptv_converter():
         "User-Agent": "okhttp"
     }
     url = requests.get(url, headers=headers, allow_redirects=False).headers.get("Location")
-    print(url)
+    # print(url)
     url = requests.get(url, headers=headers, allow_redirects=False).headers.get("Location")
-    print(url)
+    # print(url)
     # http://220.170.28.10:6410/000000002000/201500000638/index.m3u8?zte_offset=0&ispcode=2&Multicast=239.76.253.246:9000&IASHttpSessionId=RR727420250410083425880469
     # if "201500000638" in url:
         # url = re.sub(r"^https?://[^/]+", IPTV_ZBBJWS4KPROXY, url)
