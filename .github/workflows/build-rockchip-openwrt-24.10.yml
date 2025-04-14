@@ -169,28 +169,23 @@ jobs:
           cd openwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-firewall
           uci -q batch <<-EOT >/dev/null 2>&1
-                  # 添加 Web-Proxy-HTTPS 规则
-                  add firewall rule
-                  set firewall.@rule[-1].name='Web-Proxy-HTTPS'
-                  add_list firewall.@rule[-1].proto='tcp'
-                  set firewall.@rule[-1].src='wan'
-                  set firewall.@rule[-1].dest_port='8443'
-                  set firewall.@rule[-1].target='ACCEPT'
-                  commit firewall
+          # 添加 Web-Proxy-HTTPS 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Web-Proxy-HTTPS'
+          add_list firewall.@rule[-1].proto='tcp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_port='8443'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
                   
-                  # 添加 Lucky 规则
-                  add firewall rule
-                  set firewall.@rule[-1].name='Lucky'
-                  add_list firewall.@rule[-1].proto='tcp'
-                  set firewall.@rule[-1].src='wan'
-                  set firewall.@rule[-1].dest_port='16601'
-                  set firewall.@rule[-1].target='ACCEPT'
-                  commit firewall
-                  
-                  # 设置其他防火墙规则
-                  set firewall.@defaults[0].input='ACCEPT'
-                  set firewall.@defaults[0].flow_offloading='1'
-                  commit firewall
+          # 添加 Lucky 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Lucky'
+          add_list firewall.@rule[-1].proto='tcp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_port='16601'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
           EOT
           
           /etc/init.d/firewall reload >/dev/null 2>&1
@@ -211,16 +206,16 @@ jobs:
         run: |
           # 修改 network 配置文件中的 LAN IP
           cd openwrt
-          # sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
-          # echo "lan_ip: ${{ inputs.lan_ip }}"
+          sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
+          echo "lan_ip: ${{ inputs.lan_ip }}"
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
-          # if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            # sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
-            # sed -i "s/username='username'/username='${{ inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
-            # sed -i "s/password='password'/password='${{ inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
-            # echo "pppoe_account: '${{ inputs.pppoe_account }}'"
-            # echo "pppoe_password: '${{ inputs.pppoe_password }}'"
-          # fi
+          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            sed -i 's/"${2:-dhcp}"/"${2:-pppoe}"/g' package/base-files/files/lib/functions/uci-defaults.sh
+            sed -i "s/username='username'/username='${{ inputs.pppoe_account }}'/g" package/base-files/files/bin/config_generate
+            sed -i "s/password='password'/password='${{ inputs.pppoe_password }}'/g" package/base-files/files/bin/config_generate
+            echo "pppoe_account: '${{ inputs.pppoe_account }}'"
+            echo "pppoe_password: '${{ inputs.pppoe_password }}'"
+          fi
       
       - name: Set root filesystem size
         run: |
