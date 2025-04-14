@@ -197,20 +197,6 @@ jobs:
           exit 0
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-firewall
-      
-      - name: Set DHCP config
-        run: |
-          cd openwrt
-          cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-dhcp
-          uci -q batch <<-EOT >/dev/null 2>&1
-                  set dhcp.lan.ra_flags='other-config'
-                  commit dhcp
-          EOT
-          
-          /etc/init.d/odhcpd restart >/dev/null 2>&1
-          exit 0
-          EOF
-          chmod +x package/base-files/files/etc/uci-defaults/99-set-dhcp
 
       - name: Set install flask_cors
         run: |
@@ -221,10 +207,10 @@ jobs:
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
       
-      # - name: Set LAN IP and PPPoE credentials
-        # run: |
+      - name: Set LAN IP and PPPoE credentials
+        run: |
           # 修改 network 配置文件中的 LAN IP
-          # cd openwrt
+          cd openwrt
           # sed -i 's/192.168.1.1/${{ inputs.lan_ip }}/g' package/base-files/files/bin/config_generate
           # echo "lan_ip: ${{ inputs.lan_ip }}"
           # 配置 WAN 接口为 PPPoE，并添加用户名和密码
