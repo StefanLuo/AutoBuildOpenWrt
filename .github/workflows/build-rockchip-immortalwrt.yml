@@ -382,8 +382,8 @@ jobs:
       - name: Building Rockchip ImmortalWrt
         run: |
           cd immortalwrt
-          make download -j$(nproc)
-          make -j1 V=s
+          
+          make
       
       - name: Generate Firmware SHA-256
         run: |
