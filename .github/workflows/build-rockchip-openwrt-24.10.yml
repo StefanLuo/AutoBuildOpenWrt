@@ -106,7 +106,8 @@ jobs:
           cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
-          git checkout v24.10.0-rc7
+          git pull
+          git checkout v24.10.0
           # echo "Using latest stable version: $LATEST_TAG"
       
       - name: Customize seeds
@@ -121,35 +122,35 @@ jobs:
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
           
-          curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
-          unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
-          rm -rf tmp_packages.zip ./tmp_packages
-          curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
-          unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/packages-master/net/msd_lite package
-          mv tmp_packages/packages-master/net/vlmcsd package
-          rm -rf tmp_packages.zip ./tmp_packages
+          # curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
+          # unzip tmp_packages.zip -d ./tmp_packages
+          # mv tmp_packages/immortalwrt-master/package/emortal/cpufreq package
+          # rm -rf tmp_packages.zip ./tmp_packages
+          # curl -L https://github.com/immortalwrt/packages/archive/refs/heads/master.zip -o tmp_packages.zip
+          # unzip tmp_packages.zip -d ./tmp_packages
+          # mv tmp_packages/packages-master/net/msd_lite package
+          # mv tmp_packages/packages-master/net/vlmcsd package
+          # rm -rf tmp_packages.zip ./tmp_packages
           
-          ./scripts/feeds clean
-          ./scripts/feeds update -a
+          # ./scripts/feeds clean
+          # ./scripts/feeds update -a
           
-          curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
-          unzip tmp_packages.zip -d ./tmp_packages
-          mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
-          mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
-          mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
-          mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
-          mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
-          rm -rf tmp_packages.zip ./tmp_packages
+          # curl -L https://github.com/immortalwrt/luci/archive/refs/heads/master.zip -o tmp_packages.zip
+          # unzip tmp_packages.zip -d ./tmp_packages
+          # mv tmp_packages/luci-master/applications/luci-app-msd_lite feeds/luci/applications
+          # mv tmp_packages/luci-master/applications/luci-app-vlmcsd feeds/luci/applications
+          # mv tmp_packages/luci-master/applications/luci-app-cpufreq feeds/luci/applications
+          # mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
+          # mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
+          # rm -rf tmp_packages.zip ./tmp_packages
       
       - name: Update and install the feeds
         run: |
           cd openwrt
-          rm -rf ./tmp
+          # rm -rf ./tmp
           ./scripts/feeds update -a
-          ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
-          luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
+          # ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
+          # luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
       
@@ -157,11 +158,11 @@ jobs:
         run: |
           cd openwrt
           # ls -l package/feeds/luci
-          if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
-            echo "安装了自定义软件包"
-          else
-            echo "没有安装自定义软件包"
-          fi
+          # if [ -d "package/feeds/luci/luci-app-cpufreq" ]; then
+            # echo "安装了自定义软件包"
+          # else
+            # echo "没有安装自定义软件包"
+          # fi
       
       - name: Conform the feeds
         run: |
@@ -180,7 +181,7 @@ jobs:
         run: |
           cd openwrt
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
-          yes | make oldconfig
+          # yes | make oldconfig
       
       - name: Set lan ip
         run: |
