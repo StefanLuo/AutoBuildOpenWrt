@@ -253,7 +253,7 @@ def iptv_converter():
             abort(400, "时间格式错误")
         
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
-    print(url)
+    # print(url)
     return redirect(url)
 
 # 提供 M3U 文件的 HTTP 接口
