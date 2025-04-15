@@ -113,7 +113,6 @@ jobs:
       - name: Customize seeds
         run: |
           cd immortalwrt
-          
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
       
       - name: Update and install the feeds
