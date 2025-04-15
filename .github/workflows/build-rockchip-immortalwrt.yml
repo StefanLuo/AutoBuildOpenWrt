@@ -258,10 +258,6 @@ jobs:
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='222.246.132.0/24'
-                  
-          add network route
-          set network.@route[-1].interface='iptv'
-          set network.@route[-1].target='224.0.0.0/4'
 
           add network route
           set network.@route[-1].interface='iptv'
