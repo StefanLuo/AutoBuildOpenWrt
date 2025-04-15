@@ -348,9 +348,6 @@ jobs:
           set firewall.@rule[-1].src='wan'
           set firewall.@rule[-1].dest_port='16601'
           set firewall.@rule[-1].target='ACCEPT'
-
-          # 设置其他防火墙规则
-          set firewall.@defaults[0].flow_offloading='1'
           commit firewall
           EOT
           
@@ -364,7 +361,7 @@ jobs:
           cd immortalwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-dhcp
           uci -q batch <<-EOT >/dev/null 2>&1
-          uci delete dhcp.@dnsmasq[0].dns_redirect
+          delete dhcp.@dnsmasq[0].dns_redirect
           set dhcp.lan.dhcpv6='server'
           set dhcp.lan.ra='server'
           commit dhcp
@@ -392,14 +389,14 @@ jobs:
           EOF
           chmod +x package/base-files/files/etc/uci-defaults/99-set-system
       
-      - name: Set install flask_cors
-        run: |
-          cd immortalwrt
-          cat <<EOF > package/base-files/files/etc/uci-defaults/99-install-flask-cors
-          pip install flask_cors
-          exit 0
-          EOF
-          chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
+      # - name: Set install flask_cors
+        # run: |
+          # cd immortalwrt
+          # cat <<EOF > package/base-files/files/etc/uci-defaults/99-install-flask-cors
+          # pip install flask_cors
+          # exit 0
+          # EOF
+          # chmod +x package/base-files/files/etc/uci-defaults/99-install-flask-cors
       
       # - name: Set LAN IP and PPPoE credentials
         # run: |
