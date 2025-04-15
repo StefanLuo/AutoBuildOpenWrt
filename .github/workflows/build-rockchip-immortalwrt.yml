@@ -221,47 +221,36 @@ jobs:
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='10.0.0.0/8'
-
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='61.150.160.0/24'
-          
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='124.232.131.0/24'
-          
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='124.232.135.0/24'
-
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='124.232.149.0/24'
-          
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='124.232.231.0/24'
-
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='175.10.54.0/24'
-
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='220.168.138.0/24'
-          
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='220.170.28.0/24'
-          
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='222.246.132.0/24'
-
           add network route
           set network.@route[-1].interface='iptv'
           set network.@route[-1].target='239.76.0.0/16'
-          
           commit network
           EOT
           
@@ -327,7 +316,6 @@ jobs:
           set firewall.@rule[-1].dest_ip='224.0.0.0/4'
           set firewall.@rule[-1].family='ipv4'
           set firewall.@rule[-1].target='ACCEPT'
-          commit firewall
 
           # 添加 Allow-UDP-Udpxy 规则
           add firewall rule
@@ -336,7 +324,6 @@ jobs:
           set firewall.@rule[-1].src='wan'
           set firewall.@rule[-1].dest_ip='224.0.0.0/4'
           set firewall.@rule[-1].target='ACCEPT'
-          commit firewall
           
           # 添加 Web-Proxy-HTTPS 规则
           add firewall rule
@@ -345,7 +332,6 @@ jobs:
           set firewall.@rule[-1].src='wan'
           set firewall.@rule[-1].dest_port='8443'
           set firewall.@rule[-1].target='ACCEPT'
-          commit firewall
 
           # 添加 Web-Proxy-HTTP 规则
           add firewall rule
@@ -354,7 +340,6 @@ jobs:
           set firewall.@rule[-1].src='wan'
           set firewall.@rule[-1].dest_port='8444'
           set firewall.@rule[-1].target='ACCEPT'
-          commit firewall
           
           # 添加 Lucky 规则
           add firewall rule
