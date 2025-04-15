@@ -106,7 +106,7 @@ jobs:
       
       - name: Clone ImmortalWrt source code
         run: |
-          git clone --depth=1 --branch release-24.10.0 https://github.com/immortalwrt/immortalwrt.git
+          git clone --depth=1 --branch v24.10.0 https://github.com/immortalwrt/immortalwrt.git
       
       - name: Customize seeds
         run: |
