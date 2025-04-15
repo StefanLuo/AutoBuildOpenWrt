@@ -420,7 +420,6 @@ jobs:
       - name: Building Rockchip ImmortalWrt
         run: |
           cd immortalwrt
-          
           make
       
       - name: Generate Firmware SHA-256
