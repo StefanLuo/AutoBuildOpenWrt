@@ -323,6 +323,26 @@ jobs:
           cd immortalwrt
           cat <<EOF > package/base-files/files/etc/uci-defaults/99-set-firewall
           uci -q batch <<-EOT >/dev/null 2>&1
+          # 添加 Allow-UDP-IGMPProxy 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Allow-UDP-IGMPProxy'
+          add_list firewall.@rule[-1].proto='udp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest='lan'
+          set firewall.@rule[-1].dest_ip='224.0.0.0/4'
+          set firewall.@rule[-1].family='ipv4'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
+
+          # 添加 Allow-UDP-Udpxy 规则
+          add firewall rule
+          set firewall.@rule[-1].name='Allow-UDP-Udpxy'
+          add_list firewall.@rule[-1].proto='udp'
+          set firewall.@rule[-1].src='wan'
+          set firewall.@rule[-1].dest_ip='224.0.0.0/4'
+          set firewall.@rule[-1].target='ACCEPT'
+          commit firewall
+          
           # 添加 Web-Proxy-HTTPS 规则
           add firewall rule
           set firewall.@rule[-1].name='Web-Proxy-HTTPS'
