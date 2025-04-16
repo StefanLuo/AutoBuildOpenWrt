@@ -6,7 +6,7 @@ config phyint
 	option network iptv
 	option zone iptv
 	option direction upstream
-	list altnet 239.76.0.0/16
+	list altnet 10.0.0.0/8
 
 config phyint
 	option network lan
