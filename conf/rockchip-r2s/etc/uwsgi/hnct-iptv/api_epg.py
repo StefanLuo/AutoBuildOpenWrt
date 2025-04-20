@@ -259,9 +259,7 @@ def iptv_converter():
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
     elif utc and lutc:
         starttime = convert_timestamp_to_utc(int(utc))
-        print(starttime)
         endtime = convert_timestamp_to_utc(int(lutc))
-        print(endtime)
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
     # print(url)
     return redirect(url)
