@@ -174,7 +174,7 @@ def generate_epg_xml(after_day):
 
     return {"message": "EPG 文件已保存"}, 200
 
-# 时间转换成 UTC 时区
+# 时间转换成 UTC 时区，时间值里须带utc
 def time_to_zone(m_time):
     try:
         dt = datetime.strptime(m_time, "%Y%m%d%H%M%S")
@@ -183,6 +183,7 @@ def time_to_zone(m_time):
     except ValueError:
         return None
 
+# 时间转换成 UTC 时区，时间值里不带utc
 def convert_to_utc(m_time):
     try:
         # 解析 EPG 时间字符串
@@ -195,12 +196,13 @@ def convert_to_utc(m_time):
     except ValueError:
         return None
         
-def generate_random_number(digits):
-    if digits <= 0:
-        abort(400, "随机数位数错误")
-    min_value = 10**(digits - 1)
-    max_value = 10**digits - 1
-    return random.randint(min_value, max_value)
+# 时间戳转换成 UTC 时区
+def convert_timestamp_to_utc(m_time):
+    try:
+        utc_time = datetime.utcfromtimestamp(m_time)
+        return utc_time.strftime("%Y%m%d%H%M%S")
+    except ValueError:
+        return None
 
 @app.route("/iptv")
 def iptv_converter():
@@ -208,7 +210,9 @@ def iptv_converter():
     multicast = request.args.get("Multicast")
     playseek = request.args.get("playseek")
     ispcode = request.args.get("ispcode")
-
+    utc = request.args.get("utc")
+    lutc = request.args.get("lutc")
+    
     if not source_url:
         abort(404, "URL 参数缺失")
 
@@ -228,7 +232,7 @@ def iptv_converter():
         # abort(400, "Multicast 地址缺失")
         url = url + f'&Multicast={multicast}'
     headers = {
-        "User-Agent": "okhttp"
+        "User-Agent": "Mozilla/5.0 (Linux; Android 9) HN-EC6108V9/1.0 (Linux;U;Android 9) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Safari/537.36"
     }
     url = requests.get(url, headers=headers, allow_redirects=False).headers.get("Location")
     # print(url)
@@ -252,6 +256,12 @@ def iptv_converter():
         if not starttime or not endtime:
             abort(400, "时间格式错误")
         
+        url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
+    elif utc and lutc:
+        starttime = convert_timestamp_to_utc(int(utc))
+        print(starttime)
+        endtime = convert_timestamp_to_utc(int(lutc))
+        print(endtime)
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
     # print(url)
     return redirect(url)
