@@ -108,7 +108,7 @@ jobs:
         run: |
           git clone https://github.com/immortalwrt/immortalwrt.git
           cd immortalwrt
-          git checkout v24.10.0 -b openwrt-24.10.0
+          git checkout openwrt-24.10
       
       - name: Customize seeds
         run: |
