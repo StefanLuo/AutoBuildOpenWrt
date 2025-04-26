@@ -210,8 +210,12 @@ def iptv_converter():
     multicast = request.args.get("Multicast")
     playseek = request.args.get("playseek")
     ispcode = request.args.get("ispcode")
-    utc = request.args.get("utc")
-    lutc = request.args.get("lutc")
+    
+    if multicast and '?' in multicast:
+        multicast_query = multicast.split('?', 1)
+        utc = multicast_query[1].replace("utc=", "")
+    else:
+        utc = request.args.get("utc")
     
     if not source_url:
         abort(404, "URL 参数缺失")
@@ -257,11 +261,13 @@ def iptv_converter():
             abort(400, "时间格式错误")
         
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
-    elif utc and lutc:
+    elif utc:
         starttime = convert_timestamp_to_utc(int(utc))
-        endtime = convert_timestamp_to_utc(int(lutc))
+        # endtime = convert_timestamp_to_utc(int(datetime.utcnow().timestamp()))
+        default_duration = 2 * 60 * 60  # 2小时，单位秒
+        endtime = convert_timestamp_to_utc(int(utc) + default_duration)
         url = url.replace("zte_offset=0&", f"starttime={starttime}&").replace("ispcode=2&", f"endtime={endtime}&")
-    # print(url)
+    print(url)
     return redirect(url)
 
 # 提供 M3U 文件的 HTTP 接口
