@@ -231,12 +231,13 @@ def iptv_converter():
 
     base = f"{source_url}&ispcode={ispcode}" + (f"&Multicast={multicast}" if multicast else "")
     try:
-        r1 = requests.get(base, headers={"User-Agent": USER_AGENT}, allow_redirects=True, timeout=TIMEOUT)
-        real_url = r1.text.strip().splitlines()[-1]
+        r1 = requests.get(base, headers={"User-Agent": USER_AGENT}, allow_redirects=False, timeout=TIMEOUT)
+        r1 = re.sub(r"^https?://[^/]+", IPTV_ZBPROXY, r1.headers.get("Location"))
+        r2 = requests.get(r1, headers={"User-Agent": USER_AGENT}, allow_redirects=True, timeout=TIMEOUT)
+        real_url = r2.text.strip().splitlines()[-1]
     except Exception as e:
         abort(502, description=f"流重定向失败: {e}")
 
-    #final = re.sub(r"^https?://[^/]+", IPTV_ZBPROXY, real_url)
     channel_path = urlparse(base).path.rsplit('/', 1)[0] + '/'
     final = f"{IPTV_ZBPROXY}{channel_path}{real_url}"
     if playseek:
@@ -246,13 +247,11 @@ def iptv_converter():
         st, et = convert_to_utc(parts[0]), convert_to_utc(parts[1])
         if not st or not et:
             abort(400, description="时间格式错误")
-        #final = final.replace("zte_offset=0&", f"starttime={st}&").replace("ispcode=2&", f"endtime={et}&")
         final = update_m3u8_url(final, st, et, '3')
     elif utc:
         st, et = convert_timestamp_to_utc(int(utc)), convert_timestamp_to_utc(int(utc)+2*60*60)
-        #final = final.replace("zte_offset=0&", f"starttime={st}&").replace("ispcode=2&", f"endtime={et}&")
         final = update_m3u8_url(final, st, et, '3')
-        
+    
     return redirect(final)
 
 @app.route(f"/{M3U_OUTPUT_FILE}")
