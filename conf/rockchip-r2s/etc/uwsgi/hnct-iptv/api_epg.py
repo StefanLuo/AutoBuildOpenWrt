@@ -2,6 +2,7 @@ import os
 import time
 import requests
 import re
+import logging
 from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
 from functools import wraps
@@ -9,6 +10,7 @@ from flask import Flask, request, Response, abort, redirect, jsonify
 from urllib.parse import urlparse, parse_qs, urlencode
 
 app = Flask(__name__)
+app.logger.setLevel(logging.WARNING)  # 或 logging.ERROR
 
 # ====== 配置区 ======
 API_TOKEN = "LuoCan_2025x@" # 简单固定Token
