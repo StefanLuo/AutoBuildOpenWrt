@@ -1,0 +1,51 @@
+uci -q batch <<-EOT >/dev/null 2>&1
+	# 添加 Allow-UDP-IGMPProxy 规则
+	add firewall rule
+	set firewall.@rule[-1].name='Allow-UDP-IGMPProxy'
+	add_list firewall.@rule[-1].proto='udp'
+	set firewall.@rule[-1].src='wan'
+	set firewall.@rule[-1].dest='lan'
+	set firewall.@rule[-1].dest_ip='224.0.0.0/4'
+	set firewall.@rule[-1].family='ipv4'
+	set firewall.@rule[-1].target='ACCEPT'
+	commit firewall
+
+	# 添加 Allow-UDP-Udpxy 规则
+	add firewall rule
+	set firewall.@rule[-1].name='Allow-UDP-Udpxy'
+	add_list firewall.@rule[-1].proto='udp'
+	set firewall.@rule[-1].src='wan'
+	set firewall.@rule[-1].dest_ip='224.0.0.0/4'
+	set firewall.@rule[-1].target='ACCEPT'
+	commit firewall
+
+	# 添加 Web-Proxy-HTTPS 规则
+	add firewall rule
+	set firewall.@rule[-1].name='Web-Proxy-HTTPS'
+	add_list firewall.@rule[-1].proto='tcp'
+	set firewall.@rule[-1].src='wan'
+	set firewall.@rule[-1].dest_port='8443'
+	set firewall.@rule[-1].target='ACCEPT'
+	commit firewall
+
+	# 添加 Web-Proxy-HTTP 规则
+	add firewall rule
+	set firewall.@rule[-1].name='Web-Proxy-HTTP'
+	add_list firewall.@rule[-1].proto='tcp'
+	set firewall.@rule[-1].src='wan'
+	set firewall.@rule[-1].dest_port='8444'
+	set firewall.@rule[-1].target='ACCEPT'
+	commit firewall
+
+	# 添加 Lucky 规则
+	add firewall rule
+	set firewall.@rule[-1].name='Lucky'
+	add_list firewall.@rule[-1].proto='tcp'
+	set firewall.@rule[-1].src='wan'
+	set firewall.@rule[-1].dest_port='16601'
+	set firewall.@rule[-1].target='ACCEPT'
+	commit firewall
+EOT
+
+/etc/init.d/firewall reload >/dev/null 2>&1
+exit 0

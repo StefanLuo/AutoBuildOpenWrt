@@ -1,0 +1,7 @@
+uci -q batch <<-EOT >/dev/null 2>&1
+	delete dhcp.@dnsmasq[0].dns_redirect
+	commit dhcp
+EOT
+
+/etc/init.d/odhcpd restart >/dev/null 2>&1
+exit 0

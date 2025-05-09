@@ -1,0 +1,64 @@
+uci -q batch <<-EOT >/dev/null 2>&1
+	# 设置 IPTV 接口
+	set network.iptv='interface'
+	set network.iptv.device='eth2'
+	set network.iptv.proto='pppoe'
+	set network.iptv.username='XT004907746002@VOD'
+	set network.iptv.password='867492'
+	set network.iptv.defaultroute='0'
+	commit network
+
+	# 添加 IPTV 静态路由
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='10.0.0.0/8'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='61.150.160.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='124.232.131.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='124.232.135.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='124.232.149.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='124.232.231.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='175.10.54.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='220.168.138.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='220.170.28.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='222.246.132.0/24'
+	add network route
+	set network.@route[-1].interface='iptv'
+	set network.@route[-1].target='239.76.0.0/16'
+	commit network
+	
+	# 设置 IPTV 防火墙
+	set firewall.iptv='zone'
+	set firewall.iptv.name='iptv'
+	set firewall.iptv.network='iptv'
+	set firewall.iptv.input='ACCEPT'
+	set firewall.iptv.output='ACCEPT'
+	set firewall.iptv.forward='ACCEPT'
+	set firewall.iptv.masq='1'
+	set firewall.iptv.mtu_fix='1'
+	add firewall forwarding
+	set firewall.@forwarding[-1].src='lan'
+	set firewall.@forwarding[-1].dest='iptv'
+	commit firewall
+EOT
+
+/etc/init.d/network restart >/dev/null 2>&1
+/etc/init.d/firewall reload >/dev/null 2>&1
+exit 0
