@@ -7,12 +7,14 @@ from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
 from functools import wraps
 from flask import Flask, request, Response, abort, redirect
+from flask_cors import CORS
 from urllib.parse import urlparse, parse_qs, urlencode, urljoin, quote, urlunparse
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
+CORS(app)
 
 # ====== 配置区 ======
 API_TOKEN = "LuoCan_2025x@" # 简单固定Token
@@ -388,11 +390,18 @@ def iptv_redirect():
 
         base = f"{source_url}&ispcode={ispcode}" + (f"&Multicast={multicast}" if multicast else "")
         try:
-            r1 = requests.get(base, headers={"User-Agent": USER_AGENT}, allow_redirects=True, timeout=TIMEOUT)
-            real_url = r1.text.strip().splitlines()[-1]
+            url = requests.get(base, headers={"User-Agent": USER_AGENT}, allow_redirects=False, timeout=TIMEOUT).headers.get("Location")
+            # print(f"第一次重定向：{url}")
+            url = requests.get(url, headers={"User-Agent": USER_AGENT}, allow_redirects=False, timeout=TIMEOUT).headers.get("Location")
+            # print(f"第二次重定向：{url}")
+            url = re.sub(r"^https?://[^/]+", IPTV_ZBPROXY, url)
+            res = requests.get(url, headers={"User-Agent": USER_AGENT})
+            # print(f"第三次请求：{url}")
+            real_url = res.text.strip().splitlines()[-1]
+            # print(f"真实地址：{real_url}")
         except Exception as e:
             print(f"流重定向失败: {e}")
-            abort(502, description=f"流重定向失败: {e}")
+            # abort(502, description=f"流重定向失败: {e}")
         
         channel_path = urlparse(base).path.rsplit('/', 1)[0] + '/'
         final = f"{IPTV_ZBPROXY}{channel_path}{real_url}"
@@ -409,6 +418,7 @@ def iptv_redirect():
         elif utc:
             st, et = convert_timestamp_to_utc(int(utc)), convert_timestamp_to_utc(int(utc)+2*60*60)
             final = update_m3u8_url(final, st, et, '3')
+        # print(f"最终播放链接：{final}")
         return redirect(final)
     except Exception as e:
         print(f"错误信息：{e}")
