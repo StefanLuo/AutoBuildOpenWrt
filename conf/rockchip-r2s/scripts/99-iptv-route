@@ -1,0 +1,41 @@
+#!/bin/sh
+
+TARGET_INTERFACE="iptv"
+
+TARGET_NETWORKS="
+10.0.0.0/8
+124.232.131.0/24
+124.232.135.0/24
+124.232.231.0/24
+220.170.28.0/24
+222.246.132.0/24
+224.0.0.0/4
+"
+
+[ "$INTERFACE" != "$TARGET_INTERFACE" ] && exit 0
+
+case "$ACTION" in
+ifup|update)
+    . /lib/functions/network.sh
+
+    network_get_gateway IPTV_GATEWAY "$TARGET_INTERFACE"
+
+    if [ -z "$IPTV_GATEWAY" ]; then
+        logger -t iptv-route "no gateway found"
+        exit 0
+    fi
+
+    for NET in $TARGET_NETWORKS
+    do
+        ip route del "$NET" 2>/dev/null
+        ip route add "$NET" \
+            via "$IPTV_GATEWAY" \
+            dev "$DEVICE"
+    done
+
+    logger -t iptv-route \
+        "routes updated gateway=$IPTV_GATEWAY"
+;;
+esac
+
+exit 0
