@@ -127,7 +127,9 @@ jobs:
           # src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           # EOF
           
+          cat >> feeds.conf.default <<EOF
           src-git rtp2httpd https://github.com/stackia/rtp2httpd.git
+          EOF
           
           mkdir package/luci-app-openclash
           cd package/luci-app-openclash
