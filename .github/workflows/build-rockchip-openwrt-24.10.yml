@@ -110,13 +110,14 @@ jobs:
       
       - name: Clone OpenWRT source code
         run: |
-          git clone https://git.openwrt.org/openwrt/openwrt.git
+          # git clone https://git.openwrt.org/openwrt/openwrt.git
+          CHECKOUT_TAG=${{ inputs.version }}
+          git clone --branch $CHECKOUT_TAG https://github.com/openwrt/openwrt.git
           cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
-          CHECKOUT_TAG=${{ inputs.version }}
-          git pull
-          git checkout $CHECKOUT_TAG
+          # git pull
+          # git checkout $CHECKOUT_TAG
           echo "Using version: $CHECKOUT_TAG"
       
       - name: Customize seeds
@@ -178,15 +179,15 @@ jobs:
           # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
       
-      - name: Check if custom software installed
-        run: |
-          cd openwrt
-          ls -l package/feeds/luci
-          if [ -d "package/feeds/luci/luci-app-openclash" ]; then
-            echo "安装了自定义软件包"
-          else
-            echo "没有安装自定义软件包"
-          fi
+      # - name: Check if custom software installed
+        # run: |
+          # cd openwrt
+          # ls -l package/feeds/luci
+          # if [ -d "package/feeds/luci/luci-app-openclash" ]; then
+            # echo "安装了自定义软件包"
+          # else
+            # echo "没有安装自定义软件包"
+          # fi
       
       - name: Conform the feeds
         run: |
