@@ -128,11 +128,6 @@ jobs:
           # src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           # EOF
           
-          sed -i 's#packages.git#packages.git;openwrt-24.10#' feeds.conf.default
-          sed -i 's#luci.git#luci.git;openwrt-24.10#' feeds.conf.default
-          sed -i 's#routing.git#routing.git;openwrt-24.10#' feeds.conf.default
-          sed -i 's#telephony.git#telephony.git;openwrt-24.10#' feeds.conf.default
-          
           cat >> feeds.conf.default <<EOF
           src-git rtp2httpd https://github.com/stackia/rtp2httpd.git
           EOF
