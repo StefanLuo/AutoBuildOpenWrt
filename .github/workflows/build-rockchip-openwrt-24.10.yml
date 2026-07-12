@@ -112,7 +112,7 @@ jobs:
         run: |
           # git clone https://git.openwrt.org/openwrt/openwrt.git
           CHECKOUT_TAG=${{ inputs.version }}
-          git clone --branch $CHECKOUT_TAG --depth 1 https://github.com/openwrt/openwrt.git
+          git clone --branch $CHECKOUT_TAG --single-branch https://github.com/openwrt/openwrt.git
           # cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
