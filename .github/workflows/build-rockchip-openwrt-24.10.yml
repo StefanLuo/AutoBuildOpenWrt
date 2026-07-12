@@ -113,7 +113,7 @@ jobs:
           # git clone https://git.openwrt.org/openwrt/openwrt.git
           CHECKOUT_TAG=${{ inputs.version }}
           git clone --branch $CHECKOUT_TAG https://github.com/openwrt/openwrt.git
-          cd openwrt
+          # cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
           # git pull
@@ -141,7 +141,7 @@ jobs:
           git pull --depth 1 origin master
           git branch --set-upstream-to=origin/master master
           
-          cd openwrt
+          cd ../../
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
@@ -348,6 +348,47 @@ jobs:
           exit 0
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-iptv-interface
+
+            cat <<EOF > package/base-files/files/etc/hotplug.d/iface/99-iptv-route
+          uci -q batch <<-EOT >/dev/null 2>&1
+          #!/bin/sh
+          
+          # 1. 设置你需要监控的接口名（对应 LuCI 中的接口名称）
+          TARGET_INTERFACE="iptv"
+
+          # 2. 设置你需要走 IPTV 网关的目标网段（例如 IPTV 电视盒子的业务网段，这里以 202.0.0.0/8 为例，可根据实际调整）
+          # 如果有多个网段，可以用空格隔开，例如 "202.0.0.0/8 61.0.0.0/8"
+          TARGET_NETWORKS="10.0.0.0/8 124.232.131.0/24 124.232.135.0/24 124.232.231.0/24 220.170.28.0/24 222.246.132.0/24 224.0.0.0/4"
+
+          # 检查当前触发的接口和动作
+          if [ "$INTERFACE" = "$TARGET_INTERFACE" ]; then
+            if [ "$ACTION" = "ifup" ] || [ "$ACTION" = "update" ]; then
+              # 获取 iptv 接口当前的 IP 地址
+              . /lib/functions/network.sh
+              network_get_ipaddr CURRENT_IP "$TARGET_INTERFACE"
+              
+              if [ -n "$CURRENT_IP" ]; then
+                # 自动提取前两段（如 30.171.105.246 -> 30.171）
+                IP_PREFIX=$(echo "$CURRENT_IP" | cut -d'.' -f1-2)
+                IPTV_GATEWAY="${IP_PREFIX}.0.1"
+                
+                # 循环添加动态路由，绑定到 eth2 物理网卡
+                for NET in $TARGET_NETWORKS; do
+                  ip route del "$NET" dev eth2 2>/dev/null
+                  ip route add "$NET" via "$IPTV_GATEWAY" dev eth2
+                done
+                
+                logger -t iptv-route "iptv interface updated! Gateway successfully set to $IPTV_GATEWAY"
+              fi
+            fi
+          fi
+          EOT
+
+          /etc/init.d/network restart >/dev/null 2>&1
+          /etc/init.d/firewall reload >/dev/null 2>&1
+          exit 0
+          EOF
+            chmod +x package/base-files/files/etc/hotplug.d/iface/99-iptv-route
           fi
       
       - name: Set wireguard
