@@ -81,6 +81,17 @@ jobs:
           large-packages: true
           swap-storage: true
       
+      - name: Extra cleanup
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /opt/hostedtoolcache
+          docker system prune -af || true
+          df -h
+      
       - name: Set up OpenWRT build environment
         run: |
           sudo apt-get update
@@ -112,13 +123,24 @@ jobs:
         run: |
           # git clone https://git.openwrt.org/openwrt/openwrt.git
           CHECKOUT_TAG=${{ inputs.version }}
-          git clone --branch $CHECKOUT_TAG --single-branch https://github.com/openwrt/openwrt.git
+          git clone --depth 1 --branch $CHECKOUT_TAG --single-branch https://github.com/openwrt/openwrt.git
           # cd openwrt
           # git fetch --tags
           # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
           # git pull
           # git checkout $CHECKOUT_TAG
           echo "Using version: $CHECKOUT_TAG"
+      
+      - name: Cache OpenWrt
+        uses: actions/cache@v4
+        with:
+          path: |
+            openwrt/dl
+            openwrt/staging_dir
+          key: |
+            openwrt-${{ inputs.version }}-${{ hashFiles('imm/rockchip-r2s/imm.config') }}
+          restore-keys: |
+            openwrt-${{ inputs.version }}-
       
       - name: Customize seeds
         run: |
@@ -189,11 +211,6 @@ jobs:
             # echo "没有安装自定义软件包"
           # fi
       
-      - name: Conform the feeds
-        run: |
-          cd openwrt
-          ./scripts/feeds install -a
-      
       # - name: Setup Rust version to 1.85.0
         # run: |
           # cd openwrt
@@ -206,6 +223,7 @@ jobs:
         run: |
           cd openwrt
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
+          make defconfig
           # yes | make oldconfig
       
       - name: Set lan ip
@@ -504,11 +522,23 @@ jobs:
             # cp -r ${{ github.workspace }}/www/* files/www/
           fi
       
+      - name: Check disk before build
+        run: |
+          df -h
+          du -sh openwrt/* 2>/dev/null | sort -h | tail -20
+
       - name: Building Rockchip OpenWrt
         run: |
           cd openwrt
           make download -j$(nproc)
+          df -h
           make -j1 V=s
+
+      - name: Check disk after build
+        if: always()
+        run: |
+          df -h
+          du -sh openwrt/* 2>/dev/null | sort -h
       
       - name: Generate Firmware SHA-256
         run: |
