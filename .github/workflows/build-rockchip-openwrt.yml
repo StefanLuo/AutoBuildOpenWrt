@@ -531,11 +531,15 @@ jobs:
         run: |
           du -sh openwrt/package/* | sort -h | tail -30
       
-      - name: Building Rockchip OpenWrt
+      - name: Download build files
         run: |
           cd openwrt
           make download -j$(nproc)
           df -h
+      
+      - name: Building Rockchip OpenWrt
+        run: |
+          cd openwrt
           make -j1 V=s
 
       - name: Check disk after build
