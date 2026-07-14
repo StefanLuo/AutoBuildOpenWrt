@@ -526,7 +526,11 @@ jobs:
         run: |
           df -h
           du -sh openwrt/* 2>/dev/null | sort -h | tail -20
-
+      
+      - name: Check package size
+        run: |
+          du -sh openwrt/package/* | sort -h | tail -30
+      
       - name: Building Rockchip OpenWrt
         run: |
           cd openwrt
