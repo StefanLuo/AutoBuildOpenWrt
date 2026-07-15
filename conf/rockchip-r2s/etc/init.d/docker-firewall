@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+start() {
+    forwarding_exists() {
+        local src="$1"
+        local dest="$2"
+        local i=0
+
+        while uci -q get firewall.@forwarding[$i] >/dev/null; do
+            if [ "$(uci -q get firewall.@forwarding[$i].src)" = "$src" ] &&
+               [ "$(uci -q get firewall.@forwarding[$i].dest)" = "$dest" ]; then
+                return 0
+            fi
+            i=$((i + 1))
+        done
+        return 1
+    }
+
+    if uci show firewall | grep -q "name='docker'"; then
+
+        if ! forwarding_exists docker wan; then
+            uci add firewall forwarding >/dev/null
+            uci set firewall.@forwarding[-1].src='docker'
+            uci set firewall.@forwarding[-1].dest='wan'
+        fi
+
+        if ! forwarding_exists lan docker; then
+            uci add firewall forwarding >/dev/null
+            uci set firewall.@forwarding[-1].src='lan'
+            uci set firewall.@forwarding[-1].dest='docker'
+        fi
+
+        uci commit firewall
+        /etc/init.d/firewall reload
+    fi
+}
