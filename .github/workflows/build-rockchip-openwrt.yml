@@ -150,9 +150,19 @@ jobs:
           # src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
           # EOF
           
-          cat >> feeds.conf.default <<EOF
-          src-git rtp2httpd https://github.com/stackia/rtp2httpd.git
-          EOF
+          # cat >> feeds.conf.default <<EOF
+          # src-git rtp2httpd https://github.com/stackia/rtp2httpd.git
+          # EOF
+          
+          git clone https://github.com/stackia/rtp2httpd.git
+          cd rtp2httpd
+          # 用预生成的 Makefile 替换原始 Makefile（已包含固定版本号、源码下载地址和 PKG_HASH）
+          mv openwrt-support/rtp2httpd/Makefile.versioned openwrt-support/rtp2httpd/Makefile
+          mv openwrt-support/luci-app-rtp2httpd/Makefile.versioned openwrt-support/luci-app-rtp2httpd/Makefile
+          # 将 openwrt-support 目录内容复制到你的 feeds 仓库
+          cp -r openwrt-support/* ../package/
+
+          cd ..
           
           git clone --depth=1 \
           --branch master \
