@@ -131,16 +131,16 @@ jobs:
           # git checkout $CHECKOUT_TAG
           echo "Using version: $CHECKOUT_TAG"
       
-      - name: Cache OpenWrt
-        uses: actions/cache@v4
-        with:
-          path: |
-            openwrt/dl
-            openwrt/staging_dir
-          key: |
-            openwrt-${{ inputs.version }}-${{ hashFiles('imm/rockchip-r2s/imm.config') }}
-          restore-keys: |
-            openwrt-${{ inputs.version }}-
+      # - name: Cache OpenWrt
+        # uses: actions/cache@v4
+        # with:
+          # path: |
+            # openwrt/dl
+            # openwrt/staging_dir
+          # key: |
+            # openwrt-${{ inputs.version }}-${{ hashFiles('imm/rockchip-r2s/imm.config') }}
+          # restore-keys: |
+            # openwrt-${{ inputs.version }}-
       
       - name: Customize seeds
         run: |
