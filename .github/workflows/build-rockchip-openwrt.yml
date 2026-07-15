@@ -427,79 +427,59 @@ jobs:
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
-
+        
       - name: Set docker firewall
         run: |
           cd openwrt
-          cat <<EOF > package/base-files/files/etc/uci-defaults/99-docker-firewall
-          uci -q batch <<-EOT >/dev/null 2>&1
+
+          cat > package/base-files/files/etc/uci-defaults/99-docker-firewall <<'EOF'
           #!/bin/sh
-          
-          # 查找指定名称的 zone 索引
-          find_zone() {
-            local idx=0
-            while uci -q get firewall.@zone[$idx] >/dev/null; do
-              if [ "$(uci -q get firewall.@zone[$idx].name)" = "$1" ]; then
-                echo "$idx"
-                return 0
-              fi
-              idx=$((idx + 1))
+
+          zone_exists() {
+            local i=0
+            while uci -q get firewall.@zone[$i] >/dev/null; do
+              [ "$(uci -q get firewall.@zone[$i].name)" = "$1" ] && return 0
+              i=$((i + 1))
             done
             return 1
           }
-          
-          # 判断 forwarding 是否已存在
+
           forwarding_exists() {
             local src="$1"
             local dest="$2"
-            local idx=0
+            local i=0
 
-            while uci -q get firewall.@forwarding[$idx] >/dev/null; do
-              if [ "$(uci -q get firewall.@forwarding[$idx].src)" = "$src" ] && [ "$(uci -q get firewall.@forwarding[$idx].dest)" = "$dest" ]; then
-                return 0
+            while uci -q get firewall.@forwarding[$i] >/dev/null; do
+              if [ "$(uci -q get firewall.@forwarding[$i].src)" = "$src" ] &&
+                 [ "$(uci -q get firewall.@forwarding[$i].dest)" = "$dest" ]; then
+                  return 0
               fi
-              idx=$((idx + 1))
+              i=$((i + 1))
             done
-            
+
             return 1
           }
-          
-          # 获取或创建 docker zone
-          ZONE="$(find_zone docker)"
 
-          if [ -z "$ZONE" ]; then
-            uci add firewall zone >/dev/null
-            ZONE="$(find_zone docker)"
+          if zone_exists docker; then
 
-            uci set firewall.@zone[$ZONE].name='docker'
-            uci set firewall.@zone[$ZONE].input='ACCEPT'
-            uci set firewall.@zone[$ZONE].output='ACCEPT'
-            uci set firewall.@zone[$ZONE].forward='ACCEPT'
-            uci set firewall.@zone[$ZONE].masq='1'
-            uci set firewall.@zone[$ZONE].mtu_fix='1'
-            uci add_list firewall.@zone[$ZONE].device='docker0'
+            if ! forwarding_exists docker wan; then
+              uci add firewall forwarding >/dev/null
+              uci set firewall.@forwarding[-1].src='docker'
+              uci set firewall.@forwarding[-1].dest='wan'
+            fi
+
+            if ! forwarding_exists lan docker; then
+              uci add firewall forwarding >/dev/null
+              uci set firewall.@forwarding[-1].src='lan'
+              uci set firewall.@forwarding[-1].dest='docker'
+            fi
+
+            uci commit firewall
           fi
 
-          # docker -> wan
-          if ! forwarding_exists docker wan; then
-            uci add firewall forwarding >/dev/null
-            uci set firewall.@forwarding[-1].src='docker'
-            uci set firewall.@forwarding[-1].dest='wan'
-          fi
-
-          # lan -> docker
-          if ! forwarding_exists lan docker; then
-            uci add firewall forwarding >/dev/null
-            uci set firewall.@forwarding[-1].src='lan'
-            uci set firewall.@forwarding[-1].dest='docker'
-          fi
-          
-          uci commit firewall
-          EOT
-          
-          /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
+
           chmod +x package/base-files/files/etc/uci-defaults/99-docker-firewall
       
       # - name: Add firewall rules
@@ -603,6 +583,23 @@ jobs:
             cp -r ${{ github.workspace }}/conf/rockchip-r2s/etc/* files/etc/
             # cp -r ${{ github.workspace }}/www/* files/www/
           fi
+
+      - name: Enable hnct-iptv service
+        run: |
+          cd openwrt
+
+          cat > package/base-files/files/etc/uci-defaults/99-enable-hnct-iptv <<'EOF'
+          #!/bin/sh
+
+          if [ -x /etc/init.d/hnct-iptv ]; then
+            /etc/init.d/hnct-iptv enable
+            /etc/init.d/hnct-iptv start
+          fi
+
+          exit 0
+          EOF
+
+          chmod +x package/base-files/files/etc/uci-defaults/99-enable-hnct-iptv
       
       - name: Check disk before build
         run: |
