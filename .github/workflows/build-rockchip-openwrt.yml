@@ -563,15 +563,18 @@ jobs:
             sha256sum -c "$file.sha256"
           done
       
+      - name: Generate release tag
+        run: |
+          echo "RELEASE_TAG=rockchip-$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+      
       - name: Upload OpenWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: rockchip
-          name: OpenWrt-Rockchip
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: OpenWrt-Rockchip ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256
-          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
