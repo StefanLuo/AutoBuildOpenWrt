@@ -1,1 +1,2 @@
 * * * * * /usr/bin/wireguard_watchdog
+*/1 * * * * test -z "$(pidof lucky)" && /usr/bin/lucky -cd /etc/config/lucky.daji >/dev/null 2>&1
