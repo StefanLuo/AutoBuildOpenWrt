@@ -160,14 +160,15 @@ jobs:
           mkdir -p package/hnct-iptv/files/etc/init.d
           mkdir -p package/hnct-iptv/files/etc/hnct-iptv
           mkdir -p package/hnct-iptv/files/etc/uci-defaults
-          mkdir -p package/hnct-iptv/files/usr/lib/python3.11/site-packages
-          python3 -m pip install --target=package/hnct-iptv/files/usr/lib/python3.11/site-packages fastapi \
-          uvicorn httpx aiofiles async-lru
+          mkdir -p package/hnct-iptv/files/etc/hnct-iptv/python_modules
+          pip3 install --no-cache-dir --no-compile --target=package/hnct-iptv/files/etc/hnct-iptv/python_modules \
+          fastapi uvicorn httpx aiofiles async-lru
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/code/* package/hnct-iptv/files/etc/hnct-iptv/
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/init.d/* package/hnct-iptv/files/etc/init.d/
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/Makefile package/hnct-iptv/Makefile
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-hnct-iptv package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
           chmod +x package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
+          chmod +x package/hnct-iptv/files/etc/init.d/hnct-iptv
           
           # curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           # unzip tmp_packages.zip -d ./tmp_packages
