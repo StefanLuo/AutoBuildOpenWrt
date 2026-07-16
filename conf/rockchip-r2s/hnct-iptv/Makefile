@@ -6,14 +6,15 @@ PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-
 define Package/hnct-iptv
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=HNCT IPTV FastAPI Service
+  TITLE:=HNCT IPTV API Service
   DEPENDS:=+python3
 endef
 
+define Build/Compile
+endef
 
 define Package/hnct-iptv/install
 
@@ -24,10 +25,6 @@ define Package/hnct-iptv/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/hnct-iptv \
 		$(1)/etc/init.d/
-
-	$(INSTALL_DIR) $(1)/usr/lib/python3.11/site-packages
-	$(CP) ./files/usr/lib/python3.11/site-packages/* \
-		$(1)/usr/lib/python3.11/site-packages/
 
 endef
 
