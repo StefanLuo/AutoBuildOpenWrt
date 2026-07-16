@@ -21,7 +21,7 @@ on:
       rootfs_partsize:
         description: '设置软件包大小，单位(MB)'
         required: true
-        default: '1024'
+        default: '2048'
       lan_ip:
         description: '设置 LAN IP 地址'
         required: true
