@@ -223,7 +223,34 @@ jobs:
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
           make defconfig
       
-      - name: Set uci-defaults scripts
+      - name: Add opkg architecture
+        run: |
+          cd openwrt
+          mkdir -p files/etc/opkg
+          cat > files/etc/opkg/arch.conf <<'EOF'
+          arch all 1
+          arch noarch 1
+          arch aarch64_generic 10
+          arch aarch64_cortex-a53 5
+          EOF
+      
+      - name: Add Customefeeds conf
+        run: |
+          cd openwrt
+          mkdir -p files/etc/opkg
+          cat > files/etc/opkg/customfeeds.conf <<'EOF'
+          src/gz istoreos_nas https://istore.istoreos.com/repo/aarch64_cortex-a53/nas
+          src/gz istoreos_luci https://istore.istoreos.com/repo/all/nas_luci
+          src/gz istoreos_store https://istore.istoreos.com/repo/all/store
+          src/gz istoreos_compat https://istore.istoreos.com/repo/all/compat
+          src/gz/trusted cooluc_package https://opkg.cooluc.com/openwrt-24.10/aarch64_generic
+          EOF
+          
+          mkdir -p files/etc/opkg/keys
+          wget -O files/etc/opkg/keys/istoreos-build.pub https://istore.istoreos.com/repo/key-build.pub
+          chmod 0644 files/etc/opkg/keys/istoreos-build.pub
+      
+      - name: Set lan
         run: |
           # 设置 LAN IP
           cd openwrt
