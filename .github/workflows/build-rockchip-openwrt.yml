@@ -556,6 +556,30 @@ jobs:
         run: |
           du -sh openwrt/package/* | sort -h | tail -30
       
+      - name: Inspect hnct-iptv package files
+        run: |
+          cd openwrt
+          echo "===== Directory Tree ====="
+          find package/hnct-iptv/files/etc/hnct-iptv -print
+          echo
+          echo "===== File Details ====="
+          find package/hnct-iptv/files/etc/hnct-iptv -exec ls -lh {} \;
+          echo
+          echo "===== File Types ====="
+          find package/hnct-iptv/files/etc/hnct-iptv -type f -exec file {} \;
+      
+      - name: Check hnct-iptv package files
+        run: |
+          cd openwrt
+          echo "===== HNCT IPTV Files ====="
+          find package/hnct-iptv/files -type f
+          echo
+          echo "===== File Types ====="
+          find package/hnct-iptv/files -type f -exec file {} \;
+          echo
+          echo "===== ELF Files ====="
+          find package/hnct-iptv/files -type f -exec file {} \; | grep ELF || true
+      
       - name: Download build files
         run: |
           cd openwrt
@@ -572,6 +596,16 @@ jobs:
         run: |
           df -h
           du -sh openwrt/* 2>/dev/null | sort -h
+      
+      - name: Inspect hnct-iptv package
+        if: always()
+        run: |
+          cd openwrt
+          PKGDIR=$(find build_dir -type d -path "*/ipkg-aarch64_generic/hnct-iptv" | head -n1)
+          echo "PKGDIR=$PKGDIR"
+          if [ -n "$PKGDIR" ]; then
+            find "$PKGDIR" -type f -exec file {} \;
+          fi
       
       - name: Generate Firmware SHA-256
         run: |
