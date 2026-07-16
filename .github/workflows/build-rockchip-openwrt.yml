@@ -121,14 +121,8 @@ jobs:
       
       - name: Clone OpenWRT source code
         run: |
-          # git clone https://git.openwrt.org/openwrt/openwrt.git
           CHECKOUT_TAG=${{ inputs.version }}
           git clone --depth 1 --branch $CHECKOUT_TAG --single-branch https://github.com/openwrt/openwrt.git
-          # cd openwrt
-          # git fetch --tags
-          # LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
-          # git pull
-          # git checkout $CHECKOUT_TAG
           echo "Using version: $CHECKOUT_TAG"
       
       # - name: Cache OpenWrt
@@ -136,23 +130,14 @@ jobs:
         # with:
           # path: |
             # openwrt/dl
-            # openwrt/staging_dir
           # key: |
             # openwrt-${{ inputs.version }}-${{ hashFiles('imm/rockchip-r2s/imm.config') }}
           # restore-keys: |
             # openwrt-${{ inputs.version }}-
       
-      - name: Customize seeds
+      - name: Customize packages
         run: |
           cd openwrt
-          # cat >> feeds.conf.default <<EOF
-          # src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall.git;main
-          # src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git;main
-          # EOF
-          
-          # cat >> feeds.conf.default <<EOF
-          # src-git rtp2httpd https://github.com/stackia/rtp2httpd.git
-          # EOF
           
           git clone https://github.com/stackia/rtp2httpd.git
           cd rtp2httpd
@@ -164,17 +149,25 @@ jobs:
 
           cd ..
           
-          git clone --depth=1 \
-          --branch master \
-          https://github.com/vernesong/OpenClash.git \
-          package/luci-app-openclash
-          
+          git clone --depth=1 --branch master https://github.com/vernesong/OpenClash.git package/luci-app-openclash
           rm -rf package/luci-app-openclash/.git
           
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
           git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
           cp ${{ github.workspace }}/package/lucky/Makefile package/lucky/lucky/Makefile
+
+          mkdir -p package/hnct-iptv/files/etc/init.d
+          mkdir -p package/hnct-iptv/files/etc/hnct-iptv
+          mkdir -p package/hnct-iptv/files/etc/uci-defaults
+          mkdir -p package/hnct-iptv/files/usr/lib/python3.11/site-packages
+          python3 -m pip install --target=package/hnct-iptv/files/usr/lib/python3.11/site-packages fastapi \
+          uvicorn httpx aiofiles async-lru
+          cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/code/* package/hnct-iptv/files/etc/hnct-iptv/
+          cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/init.d/* package/hnct-iptv/files/etc/init.d/
+          cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/Makefile package/hnct-iptv/Makefile
+          cp -r ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-hnct-iptv package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
+          chmod +x package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
           
           # curl -L https://github.com/immortalwrt/immortalwrt/archive/refs/heads/master.zip -o tmp_packages.zip
           # unzip tmp_packages.zip -d ./tmp_packages
@@ -201,11 +194,8 @@ jobs:
       - name: Update and install the feeds
         run: |
           cd openwrt
-          # rm -rf ./tmp
+          
           ./scripts/feeds update -a
-          # ./scripts/feeds install libev libpam liblzma libnetsnmp curl \
-          # luci luci-lua-runtime luci-base luci-compat csstidy luasrcdiet golang
-          # coreutils coreutils-base64 coreutils-nohup luci-lib-jsonc
           ./scripts/feeds install -a
       
       # - name: Check if custom software installed
@@ -231,9 +221,8 @@ jobs:
           cd openwrt
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
           make defconfig
-          # yes | make oldconfig
       
-      - name: Set lan ip
+      - name: Set uci-defaults scripts
         run: |
           # 设置 LAN IP
           cd openwrt
@@ -383,7 +372,7 @@ jobs:
             cp \
             ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-iptv-route \
             package/base-files/files/etc/hotplug.d/iface/99-iptv-route
-            chmod +x package/base-files/files/etc/hotplug.d/iface/99-iptv-route
+            chmod 0644 package/base-files/files/etc/hotplug.d/iface/99-iptv-route
           fi
       
       - name: Set wireguard
@@ -427,60 +416,6 @@ jobs:
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wireguard-interface
           fi
-        
-      - name: Set docker firewall
-        run: |
-          cd openwrt
-
-          cat > package/base-files/files/etc/uci-defaults/99-docker-firewall <<'EOF'
-          #!/bin/sh
-
-          zone_exists() {
-            local i=0
-            while uci -q get firewall.@zone[$i] >/dev/null; do
-              [ "$(uci -q get firewall.@zone[$i].name)" = "$1" ] && return 0
-              i=$((i + 1))
-            done
-            return 1
-          }
-
-          forwarding_exists() {
-            local src="$1"
-            local dest="$2"
-            local i=0
-
-            while uci -q get firewall.@forwarding[$i] >/dev/null; do
-              if [ "$(uci -q get firewall.@forwarding[$i].src)" = "$src" ] &&
-                 [ "$(uci -q get firewall.@forwarding[$i].dest)" = "$dest" ]; then
-                  return 0
-              fi
-              i=$((i + 1))
-            done
-
-            return 1
-          }
-
-          if zone_exists docker; then
-
-            if ! forwarding_exists docker wan; then
-              uci add firewall forwarding >/dev/null
-              uci set firewall.@forwarding[-1].src='docker'
-              uci set firewall.@forwarding[-1].dest='wan'
-            fi
-
-            if ! forwarding_exists lan docker; then
-              uci add firewall forwarding >/dev/null
-              uci set firewall.@forwarding[-1].src='lan'
-              uci set firewall.@forwarding[-1].dest='docker'
-            fi
-
-            uci commit firewall
-          fi
-
-          exit 0
-          EOF
-
-          chmod +x package/base-files/files/etc/uci-defaults/99-docker-firewall
       
       # - name: Add firewall rules
         # run: |
@@ -575,13 +510,13 @@ jobs:
         run: |
           cd openwrt
           mkdir -p files/etc
-          # mkdir -p files/etc/crontabs
-          # mkdir -p files/www
           
           if [[ "${{ inputs.profile }}" == "friendlyarm_nanopi-r2s" ]]; then
-            # cp -r ${{ github.workspace }}/crontabs/* files/etc/crontabs/
             cp -r ${{ github.workspace }}/conf/rockchip-r2s/etc/* files/etc/
-            # cp -r ${{ github.workspace }}/www/* files/www/
+          fi
+
+          if [ -d files/etc/init.d ]; then
+            find files/etc/init.d -type f -exec chmod 0755 {} \;
           fi
 
       - name: Enable hnct-iptv service
