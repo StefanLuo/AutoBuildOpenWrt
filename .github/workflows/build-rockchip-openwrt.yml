@@ -518,23 +518,6 @@ jobs:
           if [ -d files/etc/init.d ]; then
             find files/etc/init.d -type f -exec chmod 0755 {} \;
           fi
-
-      - name: Enable hnct-iptv service
-        run: |
-          cd openwrt
-
-          cat > package/base-files/files/etc/uci-defaults/99-enable-hnct-iptv <<'EOF'
-          #!/bin/sh
-
-          if [ -x /etc/init.d/hnct-iptv ]; then
-            /etc/init.d/hnct-iptv enable
-            /etc/init.d/hnct-iptv start
-          fi
-
-          exit 0
-          EOF
-
-          chmod +x package/base-files/files/etc/uci-defaults/99-enable-hnct-iptv
       
       - name: Check disk before build
         run: |
@@ -572,13 +555,13 @@ jobs:
       
       - name: Generate release tag
         run: |
-          echo "RELEASE_TAG=rockchip-$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
       
       - name: Upload OpenWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: OpenWrt-Rockchip ${{ env.RELEASE_TAG }}
+          name: OpenWrt-Rockchip-${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
