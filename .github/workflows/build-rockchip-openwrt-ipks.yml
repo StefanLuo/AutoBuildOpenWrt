@@ -1,4 +1,4 @@
-name: build-openwrt-ipks
+name: build-rockchip-openwrt-ipks
 
 on:
   workflow_dispatch:
