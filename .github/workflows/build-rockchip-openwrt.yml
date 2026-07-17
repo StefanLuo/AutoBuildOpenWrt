@@ -313,16 +313,9 @@ jobs:
           set network.wan.password='${{ inputs.pppoe_password }}'
           set network.wan.ipv6='auto'
           commit network
-          
-          delete network.wan6
-          commit network
-          
-          set firewall.@zone[1].network='wan'
-          commit firewall
           EOT
           
           /etc/init.d/network restart >/dev/null 2>&1
-          /etc/init.d/firewall reload >/dev/null 2>&1
           exit 0
           EOF
             chmod +x package/base-files/files/etc/uci-defaults/99-set-wan-pppoe
