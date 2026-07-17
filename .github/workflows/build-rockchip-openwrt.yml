@@ -161,12 +161,12 @@ jobs:
           mkdir -p package/hnct-iptv/files/etc/hnct-iptv
           mkdir -p package/hnct-iptv/files/etc/uci-defaults
           mkdir -p package/hnct-iptv/files/etc/hnct-iptv/python_modules
-          pip3 install --no-cache-dir --no-compile --target=package/hnct-iptv/files/etc/hnct-iptv/python_modules \
-          fastapi uvicorn httpx aiofiles async-lru
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/code/* package/hnct-iptv/files/etc/hnct-iptv/
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/init.d/* package/hnct-iptv/files/etc/init.d/
-          cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/Makefile package/hnct-iptv/Makefile
-          cp -r ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-hnct-iptv package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
+          cp ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/Makefile package/hnct-iptv/Makefile
+          cp ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-hnct-iptv package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
+          tar xzf ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/hnct-python-modules.tar.gz -C package/hnct-iptv/files/etc/hnct-iptv
+          mv package/hnct-iptv/files/etc/hnct-iptv/hnct-python-modules package/hnct-iptv/files/etc/hnct-iptv/python_modules
           chmod +x package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
           chmod +x package/hnct-iptv/files/etc/init.d/hnct-iptv
           
@@ -191,6 +191,11 @@ jobs:
           # mv tmp_packages/luci-master/applications/luci-app-autoreboot feeds/luci/applications
           # mv tmp_packages/luci-master/applications/luci-app-ramfree feeds/luci/applications
           # rm -rf tmp_packages.zip ./tmp_packages
+      
+      - name: Check hnct-iptv python modules
+        run: |
+          cd openwrt
+          find package/hnct-iptv/files/etc/hnct-iptv/python_modules -maxdepth 1 -type d
       
       - name: Update and install the feeds
         run: |
