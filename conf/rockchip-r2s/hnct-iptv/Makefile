@@ -10,7 +10,7 @@ define Package/hnct-iptv
   SECTION:=net
   CATEGORY:=Network
   TITLE:=HNCT IPTV API Service
-  DEPENDS:=+python3
+  DEPENDS:=+python3 +procd
 endef
 
 define Build/Compile
@@ -27,6 +27,5 @@ define Package/hnct-iptv/install
 		$(1)/etc/init.d/
 
 endef
-
 
 $(eval $(call BuildPackage,hnct-iptv))
