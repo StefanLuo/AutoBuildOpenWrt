@@ -164,7 +164,7 @@ jobs:
           cp -r ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/init.d/* package/hnct-iptv/files/etc/init.d/
           cp ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/Makefile package/hnct-iptv/Makefile
           cp ${{ github.workspace }}/conf/rockchip-r2s/scripts/99-hnct-iptv package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
-          # pip3 install fastapi uvicorn httpx aiofiles async-lru
+          # pip3 install fastapi uvicorn httpx aiofiles async-lru uvloop httptools
           tar xzf ${{ github.workspace }}/conf/rockchip-r2s/hnct-iptv/hnct-python-modules.tar.gz -C package/hnct-iptv/files/etc/hnct-iptv
           mv package/hnct-iptv/files/etc/hnct-iptv/hnct-python-modules package/hnct-iptv/files/etc/hnct-iptv/python_modules
           chmod +x package/hnct-iptv/files/etc/uci-defaults/99-hnct-iptv
