@@ -103,5 +103,5 @@ jobs:
           name: OpenWrt packages ${{ github.run_number }}
           files: |
             openwrt/bin/packages/**/*.ipk
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
