@@ -1,6 +1,11 @@
 #!/bin/sh
 
-TARGET_INTERFACE="iptv"
+[ "$ACTION" = "ifup" ] || exit 0
+[ "$INTERFACE" = "iptv" ] || exit 0
+
+DEVICE=$(ubus call network.interface.iptv status | jsonfilter -e '@.l3_device')
+
+[ -n "$DEVICE" ] || exit 0
 
 TARGET_NETWORKS="
 10.0.0.0/8
@@ -12,30 +17,13 @@ TARGET_NETWORKS="
 224.0.0.0/4
 "
 
-[ "$INTERFACE" != "$TARGET_INTERFACE" ] && exit 0
-
-case "$ACTION" in
-ifup|update)
-    . /lib/functions/network.sh
-
-    network_get_gateway IPTV_GATEWAY "$TARGET_INTERFACE"
-
-    if [ -z "$IPTV_GATEWAY" ]; then
-        logger -t iptv-route "no gateway found"
-        exit 0
-    fi
-
-    for NET in $TARGET_NETWORKS
-    do
-        ip route del "$NET" 2>/dev/null
-        ip route add "$NET" \
-            via "$IPTV_GATEWAY" \
-            dev "$DEVICE"
-    done
-
-    logger -t iptv-route \
-        "routes updated gateway=$IPTV_GATEWAY"
-;;
-esac
+for NET in $TARGET_NETWORKS
+do
+    ip route del "$NET" dev "$DEVICE" 2>/dev/null
+    
+    ip route add "$NET" dev "$DEVICE"
+    
+    logger -t iptv-route "add static route $NET dev $DEVICE"
+done
 
 exit 0
