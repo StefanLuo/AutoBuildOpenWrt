@@ -1,11 +1,10 @@
 #!/bin/sh
 
-[ "$ACTION" = "ifup" ] || exit 0
-[ "$INTERFACE" = "iptv" ] || exit 0
-
 DEVICE=$(ubus call network.interface.iptv status | jsonfilter -e '@.l3_device')
 
 [ -n "$DEVICE" ] || exit 0
+
+TARGET_INTERFACE="iptv"
 
 TARGET_NETWORKS="
 10.0.0.0/8
@@ -17,13 +16,18 @@ TARGET_NETWORKS="
 224.0.0.0/4
 "
 
-for NET in $TARGET_NETWORKS
-do
-    ip route del "$NET" dev "$DEVICE" 2>/dev/null
-    
-    ip route add "$NET" dev "$DEVICE"
-    
-    logger -t iptv-route "add static route $NET dev $DEVICE"
-done
+if [ "$INTERFACE" = "$TARGET_INTERFACE" ]; then
+    if [ "$ACTION" = "ifup" ] || [ "$ACTION" = "update" ]; then
+        
+        for NET in $TARGET_NETWORKS
+        do
+            ip route del "$NET" dev "$DEVICE" 2>/dev/null
+            
+            ip route add "$NET" dev "$DEVICE"
+            
+            logger -t iptv-route "add static route $NET dev $DEVICE"
+        done
+    fi
+fi
 
 exit 0
