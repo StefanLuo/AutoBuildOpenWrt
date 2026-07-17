@@ -79,10 +79,12 @@ jobs:
           cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
           make defconfig
       
-      - name: Download build files
+      - name: Download build files and prepare toolchain
         run: |
           cd openwrt
           make download -j$(nproc)
+          make tools/install -j$(nproc)
+          make toolchain/install -j$(nproc)
       
       - name: Building lucky
         run: |
