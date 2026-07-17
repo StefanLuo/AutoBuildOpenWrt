@@ -3,9 +3,12 @@
 START=99
 USE_PROCD=1
 
+PROG_DIR="/etc/hnct-iptv"
+
 start_service()
 {
     procd_open_instance
+
     procd_set_param command \
         /usr/bin/python3 \
         -u \
@@ -14,14 +17,22 @@ start_service()
         api_epg:app \
         --host 0.0.0.0 \
         --port 1234 \
-        --workers 1
-    procd_set_param env PYTHONPATH="/etc/hnct-iptv/python_modules:/etc/hnct-iptv"
-    procd_set_param chdir /etc/hnct-iptv
+        --workers 1 \
+        --log-level error
+
+    procd_set_param env PYTHONPATH="$PROG_DIR/python_modules:$PROG_DIR"
+
+    procd_set_param chdir "$PROG_DIR"
+
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+
     procd_set_param respawn
+
     procd_close_instance
 }
 
-stop_service() {
-    # procd 会自动根据 PID 处理停止，通常不需要额外写内容
+stop_service()
+{
     return 0
 }
