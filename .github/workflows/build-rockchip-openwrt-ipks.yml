@@ -1,4 +1,4 @@
-name: build-rockchip-openwrt-ipks
+name: build-openwrt-ipks
 
 on:
   workflow_dispatch:
@@ -16,6 +16,7 @@ on:
         description: '输入软路由型号，可选值如下：'
         options:
           - friendlyarm_nanopi-r2s
+          - x86_64
         required: true
         default: 'friendlyarm_nanopi-r2s'
 
@@ -84,7 +85,20 @@ jobs:
       - name: Copy pre-existing .config file
         run: |
           cd openwrt
-          cp ${{ github.workspace }}/imm/rockchip-r2s/imm.config .config
+          
+          case "${{ inputs.profile }}" in
+            friendlyarm_nanopi-r2s)
+              cp "${{ github.workspace }}/imm/rockchip-r2s/imm.config" .config
+              ;;
+            x86_64)
+              cp "${{ github.workspace }}/imm/x86-64/imm.config" .config
+              ;;
+            *)
+              echo "Unsupported profile: ${{ inputs.profile }}"
+              exit 1
+              ;;
+            esac
+          
           make defconfig
       
       - name: Download build files and prepare toolchain
@@ -109,8 +123,8 @@ jobs:
       - name: Release ipk
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ipk-${{ github.run_number }}
-          name: OpenWrt packages ${{ github.run_number }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: OpenWrt-Packages-${{ env.RELEASE_TAG }}
           files: |
             openwrt/bin/packages/**/*lucky*.ipk
         env:
