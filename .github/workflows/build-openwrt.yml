@@ -1,4 +1,4 @@
-name: build-rockchip-openwrt
+name: build-openwrt
 
 on:
   workflow_dispatch:
