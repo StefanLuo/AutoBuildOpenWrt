@@ -113,8 +113,10 @@ jobs:
           cd openwrt
           # 编译lucky IPK包
           make package/lucky/lucky/compile V=s
+          make package/lucky/lucky/install V=s
           # 编译luci-app-lucky IPK包
           make package/lucky/luci-app-lucky/compile V=s
+          make package/lucky/luci-app-lucky/install V=s
       
       - name: Generate release tag
         run: |
