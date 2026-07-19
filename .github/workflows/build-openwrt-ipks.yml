@@ -93,6 +93,7 @@ jobs:
           
           echo "CONFIG_PACKAGE_lucky=m" >> .config
           echo "CONFIG_PACKAGE_luci-app-lucky=m" >> .config
+          echo "CONFIG_PACKAGE_luci-i18n-lucky-zh-cn=m" >> .config
           
           make defconfig
 
