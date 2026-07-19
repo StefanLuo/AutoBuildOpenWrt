@@ -98,7 +98,6 @@ jobs:
         with:
           path: |
             openwrt/dl
-            openwrt/staging_dir
           key: openwrt-${{ inputs.version }}-${{ inputs.profile }}-${{ hashFiles('openwrt/.config') }}
       
       - name: Download build files and prepare toolchain
