@@ -77,13 +77,14 @@ jobs:
       - name: Copy pre-existing .config file
         run: |
           cd openwrt
+          cp "${{ github.workspace }}/imm/base.config" .config
           
           case "${{ inputs.profile }}" in
             friendlyarm_nanopi-r2s)
-              cp "${{ github.workspace }}/imm/rockchip-r2s/imm.config" .config
+              cat "${{ github.workspace }}/imm/rockchip-r2s/imm.config" >> .config
               ;;
             x86_64)
-              cp "${{ github.workspace }}/imm/x86-64/imm.config" .config
+              cat "${{ github.workspace }}/imm/x86-64/imm.config" >> .config
               ;;
             *)
               echo "Unsupported profile: ${{ inputs.profile }}"
