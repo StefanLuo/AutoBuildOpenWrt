@@ -94,7 +94,6 @@ jobs:
           
           echo "CONFIG_PACKAGE_lucky=m" >> .config
           echo "CONFIG_PACKAGE_luci-app-lucky=m" >> .config
-          echo "CONFIG_PACKAGE_luci-i18n-lucky-zh-cn=m" >> .config
           
           make defconfig
 
@@ -124,12 +123,24 @@ jobs:
       - name: Generate release tag
         run: |
           echo "RELEASE_TAG=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+          case "${{ inputs.profile }}" in
+            friendlyarm_nanopi-r2s)
+              echo "RELEASE_TARGET=arm64" >> $GITHUB_ENV
+              ;;
+            x86_64)
+              echo "RELEASE_TARGET=amd64" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "Unsupported profile: ${{ inputs.profile }}"
+              exit 1
+              ;;
+            esac
       
       - name: Release ipk
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: OpenWrt-Packages-${{ env.RELEASE_TAG }}
+          tag_name: ${{ env.RELEASE_TARGET }}-${{ env.RELEASE_TAG }}
+          name: OpenWrt-${{ env.RELEASE_TARGET }}-Packages-${{ env.RELEASE_TAG }}
           files: |
             openwrt/bin/packages/**/*lucky*.ipk
         env:
